@@ -1,0 +1,28 @@
+{
+  "name": "MockServer",
+  "version": "0.0.1",
+  "description": "A Simple mock server using node",
+  "author": "Richard Scoones",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rscoones/MockServer.git"
+  },
+  "devDependencies": {
+    "express": "^4.13.1",
+    "express-http-proxy": "^0.6.0",
+    "gulp": "^3.8.7",
+    "gulp-util": "^3.0.6",
+    "require-dir": "^0.3.0",
+    "webpack": "^1.10.1",
+    "webpack-dev-server": "^1.10.1",
+    "yargs": "^3.15.0"
+  },
+  "scripts": {
+    "start": "gulp",
+    "start-no-proxy": "gulp no-proxy",
+    "start-no-mock": "gulp no-mock",
+    "build": "webpack"
+  },
+  "dependencies": {}
+}
