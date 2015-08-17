@@ -4,17 +4,26 @@ var path = require('path');
 var fs = require('fs');
 
 var config = require('./config');
-var response = require('./response');
+var response = require('./service/response');
+var respond = require('./helpers/respond');
 
-var app = express();
+module.exports = {
+  start: function(conf) {
+    for (var i in conf) {
+      config[i] = conf[i];
+    }
 
-app.use(function(req, res) {
-  response(req, res, config);
-});
+    var app = express();
 
-var server = app.listen(config.port, function () {
-  console.log("");
-  console.log("==============================================");
-  console.log('Mock server running at: http://localhost:%s', config.port);
-  console.log("==============================================");
-});
+    app.use(function(req, res) {
+      respond(res, response.get(req, res, config));
+    });
+
+    var server = app.listen(config.port, function () {
+      console.log("");
+      console.log("==============================================");
+      console.log('Mock server running at: http://localhost:%s', config.port);
+      console.log("==============================================");
+    });
+  }
+};
