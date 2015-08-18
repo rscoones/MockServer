@@ -16,7 +16,11 @@ function get(req, config) {
     set(url, req.method, getFile(req, config));
   }
 
-  return getUrl(url)[req.method];
+  var page = getUrl(url)[req.method];
+  if (typeof page === "function") {
+    page = page(req);
+  }
+  return page;
 }
 
 function isSet(url, method) {

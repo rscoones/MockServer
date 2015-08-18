@@ -8,12 +8,7 @@ function getFile(req, config) {
   var filename = getFilename(req, config, folder);
 
   try {
-    var file = require(filename);
-    if (typeof file === "function") {
-      return file(req);
-    } else {
-      return file;
-    }
+    return require(filename);
   } catch(e) {
     return notFound(req);
   }
