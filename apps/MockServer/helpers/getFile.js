@@ -1,6 +1,10 @@
+var path = require('path');
+
 module.exports = getFile;
 
-function getFile(req, config, folder) {
+function getFile(req, config) {
+  var url = req.path;
+  var folder = path.join(config.base.location, url);
   var filename = getFilename(req, config, folder);
 
   try {
@@ -11,7 +15,7 @@ function getFile(req, config, folder) {
       return file;
     }
   } catch(e) {
-    return notFound(req)
+    return notFound(req);
   }
 }
 
@@ -24,13 +28,7 @@ function getFilename(req, config, folder) {
     var url = config.base.url;
     url = url.replace(/\//g, "\\");
     filename = filename.replace(url, "");
-    switch (req.method) {
-      case "POST":
-        filename += "/POST";
-        break;
-      default:
-        filename += "/GET";
-    }
+    filename += "/" + req.method;
   }
 
   return filename;

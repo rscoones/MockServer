@@ -1,7 +1,5 @@
-var path = require('path');
-var fs = require('fs');
-
 var getFile = require('../helpers/getFile');
+var context = require('./context');
 
 var _data = {};
 module.exports = {
@@ -10,28 +8,34 @@ module.exports = {
   set: set
 };
 
-function get(req, res, config) {
+function get(req, config) {
   var url = req.path;
-  var folder = path.join(config.base.location, url);
 
-  if (!isSet(folder)) {
-    set(folder, getFile(req, config, folder));
+  if (!isSet(url, req.method)) {
+    // if not set, attempt to find file and set it
+    set(url, req.method, getFile(req, config));
   }
 
-  console.log((_data[folder].found) ? req.method : "NOT FOUND: " + req.method, url.replace(config.base.url, "..."));
-  return _data[folder].data;
+  return getUrl(url)[req.method];
 }
 
-function isSet(key) {
-  if (_data[key] === null || typeof _data[key] === "undefined") {
+function isSet(url, method) {
+  if (!getUrl(url)[method]) {
     return false;
   }
   return true;
 }
 
-function set(key, data) {
-  _data[key] = {
-    data: data,
-    found: require('../helpers/found')(data)
-  };
+function set(url, method, data) {
+  getUrl(url)[method] = data;
+}
+
+function getUrl(url) {
+  if (!_data[context()]) {
+    _data[context()] = {};
+  }
+  if (!_data[context()][url]) {
+    _data[context()][url] = {};
+  }
+  return _data[context()][url];
 }

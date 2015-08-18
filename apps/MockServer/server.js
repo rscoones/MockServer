@@ -1,7 +1,5 @@
 'use strict';
 var express = require('express');
-var path = require('path');
-var fs = require('fs');
 
 var config = require('./config');
 var response = require('./service/response');
@@ -16,7 +14,7 @@ module.exports = {
     var app = express();
 
     app.use(function(req, res) {
-      respond(res, response.get(req, res, config));
+      respond(req, res, response.get(req, config));
     });
 
     var server = app.listen(config.port, function () {
