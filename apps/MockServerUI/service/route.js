@@ -6,19 +6,32 @@ module.exports = {
 }
 
 function get(req) {
-  var filename = getFilename(req);
-  
+
   return {
     headers: {},
     status: 200,
     type: getExtention(req),
-    body: fs.readFileSync(getFilename(req))
+    body: getResponse(req)
+  }
+}
+
+function getResponse(req) {
+  var filename = getFilename(req);
+
+  if (filename.indexOf("api") > -1) {
+    return require(filename)(req);
+  } else {
+    return fs.readFileSync(filename);
   }
 }
 
 function getFilename(req) {
   var url = req.path;
   var filename = url.split("/portal/")[1];
+
+  if (filename.indexOf("api") > -1) {
+    return  path.join(__dirname, "../api/", req.method);
+  }
 
   if (filename && filename.length > 0) {
     return path.join(__dirname, "../" + filename);

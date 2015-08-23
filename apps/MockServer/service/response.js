@@ -1,5 +1,6 @@
 var getFile = require('../helpers/getFile');
 var context = require('./context');
+var Q = require('q');
 
 var _data = {};
 module.exports = {
@@ -20,6 +21,7 @@ function get(req, config) {
   if (typeof page === "function") {
     page = page(req);
   }
+
   return page;
 }
 

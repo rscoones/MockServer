@@ -1,19 +1,45 @@
 var fs = require('fs');
 var path = require('path');
 var config = require('../../MockServer/config');
-var readdirp = require('readdirp');
 
 var _data = {};
 module.exports = {
   get: get
 };
 
-function get(func) {
-  readdirp({ root: config.base.location, fileFilter: '*GET*.js' })
-  .on('data', function (entry) {
-    _data[entry.parentDir] = [];
-  })
-  .on('end', function() {
-    func(_data);
-  });
+function get() {
+  var arr = [];
+
+  getFiles(config.base.location, arr);
+
+  return arr;
+}
+
+
+function getFiles(dir, files_, base) {
+  var base = base || dir;
+  files_ = files_ || [];
+  var files = fs.readdirSync(dir);
+  for (var i in files){
+    var name = dir + '/' + files[i];
+    if (fs.statSync(name).isDirectory()){
+      getFiles(name, files_, base);
+    } else {
+      files_.push(file(name, base));
+    }
+  }
+  return files_;
+}
+
+function file(filename, base) {
+  var method = "GET";
+  if (filename.indexOf("POST") > -1) {
+    method = "POST";
+  }
+  filename = filename.replace(".js", "");
+
+  return {
+    url: filename.replace(base, ""),
+    method: method
+  }
 }
