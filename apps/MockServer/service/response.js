@@ -21,7 +21,7 @@ function get(req, config) {
   if (typeof page === "function") {
     page = page(req);
   }
-
+  
   return page;
 }
 

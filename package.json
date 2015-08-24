@@ -9,6 +9,7 @@
     "url": "git@github.com:rscoones/MockServer.git"
   },
   "devDependencies": {
+    "body-parser": "^1.13.3",
     "express": "^4.13.1",
     "express-http-proxy": "^0.6.0",
     "gulp": "^3.8.7",

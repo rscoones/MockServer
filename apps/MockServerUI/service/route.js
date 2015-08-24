@@ -31,9 +31,7 @@ function getFilename(req) {
 
   if (filename.indexOf("api") > -1) {
     return  path.join(__dirname, "../api/", req.method);
-  }
-
-  if (filename && filename.length > 0) {
+  } else if (filename && filename.length > 0) {
     return path.join(__dirname, "../" + filename);
   } else {
     return path.join(__dirname, "../index.html");

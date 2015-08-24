@@ -1,5 +1,5 @@
 var file = require('../service/file');
 
 module.exports = function (req) {
-  return {urls: file.get()};
+  return file.get(req.query.url);
 }

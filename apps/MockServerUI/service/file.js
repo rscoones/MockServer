@@ -7,28 +7,65 @@ module.exports = {
   get: get
 };
 
-function get() {
+function get(url) {
+  try {
+    if (url) {
+      return {files: getFiles(url)};
+    } else {
+      return {urls: getDirectories()};
+    }
+  } catch (e) {
+    return {error: "Not Found"};
+  }
+}
+
+function getFiles(url) {
+  var files = walk(path.join(config.base.location, url));
   var arr = [];
 
-  getFiles(config.base.location, arr);
+  for (var i in files) {
+    var file = files[i];
+    if (file.folder === "/") {
+      file.folder = url;
+      arr.push(file);
+    }
+  }
 
   return arr;
 }
 
+function getDirectories() {
+  var files = walk(config.base.location);
+  var directories = {};
 
-function getFiles(dir, files_, base) {
+  for (var i in files) {
+    var file = files[i];
+    directory(directories, file);
+  }
+
+  return directories;
+}
+
+function walk(dir, files_, base) {
   var base = base || dir;
   files_ = files_ || [];
   var files = fs.readdirSync(dir);
   for (var i in files){
     var name = dir + '/' + files[i];
     if (fs.statSync(name).isDirectory()){
-      getFiles(name, files_, base);
+      walk(name, files_, base);
     } else {
       files_.push(file(name, base));
     }
   }
   return files_;
+}
+
+function directory(arr, file) {
+  if (!arr[file.folder]) {
+    arr[file.folder] = {};
+  }
+  arr[file.folder][file.method] = true;
 }
 
 function file(filename, base) {
@@ -40,6 +77,7 @@ function file(filename, base) {
 
   return {
     url: filename.replace(base, ""),
-    method: method
+    method: method,
+    folder: filename.replace(base, "").replace(/GET.*/, "")
   }
 }
