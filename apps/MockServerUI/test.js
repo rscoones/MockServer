@@ -9,32 +9,66 @@ $.ajax({
 function createList(urls) {
   for (var i in urls) {
     var obj = urls[i];
-    var li = $("<li>").html("<a href='#'>" + i + "</a>");
-    createPopup(li, obj);
-    $("#list").append(li);
+    var link = $("<a>").attr('href', "#").html(obj.url);
+    var row = $("<tr>");
+    var colUrl = $("<td>").html(link).appendTo(row);
+    createModal(link, obj);
+    $("#list").append(row);
   }
+  bindModal();
 }
 
-function createPopup(ele, obj) {
+function createModal(ele, obj) {
   $(ele).click(function() {
-    $("#dialog").dialog({
+    setPopupValues(obj);
+    getPresets(obj);
+
+    $("#modal").modal({
       modal: true,
-      width: "80%",
-      height: 400
+      width: 800,
+    });
+  });
+}
+
+function bindModal() {
+  $("#modal .btn-primary").click(function() {
+    var data = {
+      headers: [],
+      type: $("#modal #type").val(),
+      status: parseInt($("#modal #status").val()),
+      body: JSON.parse($("#modal #body").val())
+    };
+    $.ajax({
+      url: "api/",
+      method: "POST",
+      data: {url: $("#modal .modal-title").html(), method: "GET", data: data},
+      dataType: "json"
+    }).done(function(response) {
+      console.log(response);
     });
   })
 }
 
-var data = {
-  headers: [],
-  status: 500,
-  body: {success: true}
-};
+function getPresets(obj) {
+  // $.ajax({
+  //   url: "api/",
+  //   method: "GET",
+  //   data: {url: obj.url},
+  //   dataType: "json"
+  // }).done(function(data) {
+  //   $("#modal #preset").find('option').remove().end();
+  //   for (var i in data.files) {
+  //     var file = data.files[i];
+  //     var option = $("<option>").html(file.filename);
+  //     $("#modal #preset").append(option);
+  //   }
+  // });
+}
 
-$.ajax({
-  url: "api/",
-  type: "POST",
-  data: {url: "/v1/application/decision", method: "GET", data: data}
-}).done(function(data) {
-  console.log(data);
-});
+function setPopupValues(obj) {
+  $("#modal .modal-title").html(obj.url);
+  $("#modal #headers").val(JSON.stringify(obj.data.headers, null, 2));
+  $("#modal #type").val(obj.data.type);
+  $("#modal #status").val(obj.data.status);
+  $("#modal #body").val(JSON.stringify(obj.data.body, null, 2));
+}

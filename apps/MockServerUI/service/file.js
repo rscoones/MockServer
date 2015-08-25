@@ -31,17 +31,25 @@ function getFiles(url) {
     }
   }
 
+  arr.sort(function(a, b) {
+    return a.filename > b.filename;
+  });
+
   return arr;
 }
 
 function getDirectories() {
   var files = walk(config.base.location);
-  var directories = {};
+  var directories = [];
 
   for (var i in files) {
     var file = files[i];
     directory(directories, file);
   }
+
+  directories.sort(function(a, b) {
+    return a.url > b.url;
+  });
 
   return directories;
 }
@@ -62,10 +70,17 @@ function walk(dir, files_, base) {
 }
 
 function directory(arr, file) {
-  if (!arr[file.folder]) {
-    arr[file.folder] = {};
+  var found = null;
+  for (var i in arr) {
+    if (arr[i].url === file.folder) {
+      found = arr[i];
+    }
   }
-  arr[file.folder][file.method] = true;
+  if (!found) {
+    found = {url: file.folder, data: require(path.join(config.base.location, file.folder, file.method))};
+    arr.push(found);
+  }
+  found[file.method] = true;
 }
 
 function file(filename, base) {
@@ -76,8 +91,9 @@ function file(filename, base) {
   filename = filename.replace(".js", "");
 
   return {
-    url: filename.replace(base, ""),
+    filename: filename.replace(base, ""),
+    folder: filename.replace(base, "").replace(/GET.*/, ""),
     method: method,
-    folder: filename.replace(base, "").replace(/GET.*/, "")
+    data: require(path.join(filename))
   }
 }
