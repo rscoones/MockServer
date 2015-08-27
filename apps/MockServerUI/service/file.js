@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var config = require('../../MockServer/config');
+var response = require('../../MockServer/service/response');
 
 var _data = {};
 module.exports = {
@@ -77,7 +78,8 @@ function directory(arr, file) {
     }
   }
   if (!found) {
-    found = {url: file.folder, data: require(path.join(config.base.location, file.folder, file.method))};
+    var req = {path: file.folder, method: file.method};
+    found = {url: file.folder, data: response.get(req)};
     arr.push(found);
   }
   found[file.method] = true;

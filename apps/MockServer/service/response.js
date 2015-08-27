@@ -1,6 +1,5 @@
 var getFile = require('../helpers/getFile');
 var context = require('./context');
-var Q = require('q');
 
 var _data = {};
 module.exports = {
@@ -9,19 +8,18 @@ module.exports = {
   set: set
 };
 
-function get(req, config) {
+function get(req) {
   var url = req.path;
-
   if (!isSet(url, req.method)) {
     // if not set, attempt to find file and set it
-    set(url, req.method, getFile(req, config));
+    set(url, req.method, getFile(req));
   }
 
   var page = getUrl(url)[req.method];
   if (typeof page === "function") {
     page = page(req);
   }
-  
+
   return page;
 }
 
@@ -37,6 +35,10 @@ function set(url, method, data) {
 }
 
 function getUrl(url) {
+  if (url[url.length-1] !== "/") {
+    url += "/";
+  }
+  
   if (!_data[context()]) {
     _data[context()] = {};
   }

@@ -1,8 +1,9 @@
 var path = require('path');
+var config = require('../config');
 
 module.exports = getFile;
 
-function getFile(req, config) {
+function getFile(req) {
   var url = req.path;
   var folder = path.join(config.base.location, url);
   var filename = getFilename(req, config, folder);
