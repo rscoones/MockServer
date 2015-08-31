@@ -1,9 +1,13 @@
 {
   "name": "MockServer",
-  "version": "0.0.1",
-  "description": "A Simple mock server using node",
-  "author": "Richard Scoones",
-  "license": "MIT",
+  "version": "1.0.0",
+  "description": "A quick and simple yet highly customisable mocking server for APIs",
+  "author": "Richard Scoones <richard.scoones@gmail.com>",
+  "main": "./apps/MockServer/server.js",
+  "scripts": {
+    "start": "node node_modules/gulp/bin/gulp.js --gulpfile example/gulpfile.js",
+    "build-ui": "node node_modules/webpack/bin/webpack.js --config apps/MockServerUI/js/webpack.config.js"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:rscoones/MockServer.git"
@@ -16,23 +20,15 @@
     "express-http-proxy": "^0.6.0",
     "flux": "^2.1.1",
     "gulp": "^3.8.7",
-    "gulp-util": "^3.0.6",
     "jsx-loader": "^0.13.2",
     "object-assign": "^4.0.1",
-    "q": "^1.4.1",
     "qs": "^5.0.0",
     "react": "^0.13.3",
     "react-bootstrap": "^0.25.0",
     "require-dir": "^0.3.0",
     "webpack": "^1.10.1",
-    "webpack-dev-server": "^1.10.1",
     "xhr": "^2.0.4"
   },
-  "scripts": {
-    "start": "gulp",
-    "start-no-proxy": "gulp no-proxy",
-    "start-no-mock": "gulp no-mock",
-    "build": "webpack"
-  },
-  "dependencies": {}
+  "dependencies": {},
+  "license": "MIT"
 }

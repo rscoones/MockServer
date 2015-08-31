@@ -6,7 +6,7 @@ var excludes = /(node_modules)/;
 module.exports = {
   cache: true,
   entry: {
-    MockServerUI: "./src/index.jsx"
+    MockServerUI: path.join(__dirname, "./src/index.jsx")
   },
   output: {
     path: path.join(__dirname, "../"),
