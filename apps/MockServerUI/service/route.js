@@ -1,5 +1,8 @@
 var fs = require('fs');
 var path = require('path');
+var config = require('../../MockServer/config');
+
+var portalAddress = getPortalAddress();
 
 module.exports = {
   get: get
@@ -27,7 +30,7 @@ function getResponse(req) {
 
 function getFilename(req) {
   var url = req.path;
-  var filename = url.split("/portal/")[1];
+  var filename = url.split(portalAddress)[1];
 
   if (filename.indexOf("api") > -1) {
     return  path.join(__dirname, "../api/", req.method);
@@ -45,5 +48,14 @@ function getExtention(req) {
     return extension;
   } else {
     return "html";
+  }
+}
+
+function getPortalAddress() {
+  for (var i in config.overrides) {
+    var orveride = config.overrides[i];
+    if (orveride.location.indexOf('MockServerUI') > -1) {
+      return orveride.url;
+    }
   }
 }
