@@ -20393,7 +20393,7 @@ webpackJsonp([0,1],[
 	var React = __webpack_require__(1);
 	var Table = __webpack_require__(158);
 	var Popup = __webpack_require__(177);
-	var Store = __webpack_require__(270);
+	var Store = __webpack_require__(275);
 	var ActionCreator = __webpack_require__(159);
 
 	var App = React.createClass({ displayName: "App",
@@ -20460,8 +20460,8 @@ webpackJsonp([0,1],[
 
 	    var urls = this.props.urls;
 
-	    return React.createElement("table", { className: "table" }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Available URLs"))), React.createElement("tbody", { id: "list" }, urls.map(function (url) {
-	      return React.createElement("tr", { key: url.url }, React.createElement("td", null, React.createElement("a", { href: "#", onClick: _this.handleClick.bind(_this, url) }, url.url)));
+	    return React.createElement("table", { className: "table table-striped" }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Available URLs"), React.createElement("th", null, "GET"), React.createElement("th", null, "POST"))), React.createElement("tbody", { id: "list" }, urls.map(function (url) {
+	      return React.createElement("tr", { key: url.url }, React.createElement("td", null, React.createElement("a", { href: "#", onClick: _this.handleClick.bind(_this, url) }, url.url)), React.createElement("td", null, url.GET ? React.createElement("span", { className: "glyphicon glyphicon-ok", "aria-hidden": "true" }) : null), React.createElement("td", null, url.POST ? React.createElement("span", { className: "glyphicon glyphicon-ok", "aria-hidden": "true" }) : null));
 	    })));
 	  }
 
@@ -20501,14 +20501,15 @@ webpackJsonp([0,1],[
 	        uri: "api/?" + query
 	      }, function (err, resp, body) {
 	        var data = JSON.parse(resp.body);
-	        _setSelected(data.files, url);
+	        _setSelected(data, url);
 	      });
 	    } else {
 	      _setSelected(null, null);
 	    }
 	  },
-	  save: function save(selected, obj) {
-	    var data = { url: selected.url.url, method: "GET", data: JSON.stringify(obj) };
+	  save: function save(selected, obj, method) {
+	    console.log(selected, obj);
+	    var data = { url: selected.url.url, method: method, data: JSON.stringify(obj) };
 	    xhr({
 	      method: "POST",
 	      uri: "api/",
@@ -21834,20 +21835,29 @@ webpackJsonp([0,1],[
 	var Button = __webpack_require__(259);
 	var Input = __webpack_require__(265);
 	var Col = __webpack_require__(269);
+	var Nav = __webpack_require__(270);
+	var NavItem = __webpack_require__(272);
+	var Panel = __webpack_require__(274);
 	var ActionCreator = __webpack_require__(159);
 
 	var Popup = React.createClass({ displayName: "Popup",
 	  getInitialState: function getInitialState() {
 	    return {
-	      current: {}
+	      current: {},
+	      method: "GET"
 	    };
 	  },
 
 	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
 	    var selected = nextProps.selected;
 
-	    if (selected && selected.url && selected.url.data) {
-	      this.setCurrent(selected.url.data);
+	    if (selected && selected.url && selected.url) {
+	      var method = "GET";
+	      if (!selected.url.GET) {
+	        method = "POST";
+	      }
+	      this.setState({ method: method });
+	      this.setCurrent(selected.url[method]);
 	    }
 	  },
 
@@ -21864,8 +21874,9 @@ webpackJsonp([0,1],[
 	  handlePreset: function handlePreset(e) {
 	    var value = e.target.value;
 	    var files = this.props.selected.files;
+	    var method = this.state.method;
 
-	    var selected = files[value];
+	    var selected = files[method][value];
 
 	    this.setCurrent(selected.data);
 	  },
@@ -21907,33 +21918,39 @@ webpackJsonp([0,1],[
 	    this.setState({ current: current });
 	  },
 
+	  handleMethod: function handleMethod(method) {
+	    this.setState({ method: method });
+	    var selected = this.props.selected;
+
+	    this.setCurrent(selected.url[method]);
+	  },
+
 	  save: function save() {
 	    var selected = this.props.selected;
-	    var current = this.state.current;
+	    var _state = this.state;
+	    var current = _state.current;
+	    var method = _state.method;
 
 	    current.headers = JSON.parse(current.headers);
 	    current.body = JSON.parse(current.body);
-	    ActionCreator.save(selected, current);
+	    ActionCreator.save(selected, current, method);
 	    this.close();
 	  },
 
 	  render: function render() {
 	    var selected = this.props.selected;
-	    var current = this.state.current;
+	    var _state2 = this.state;
+	    var current = _state2.current;
+	    var method = _state2.method;
 
 	    var show = false;
 	    if (selected) {
 	      show = true;
 	    }
 
-	    var files = [];
-	    if (selected && selected.files) {
-	      files = selected.files;
-	    }
-
-	    return React.createElement(Modal, { show: show, onHide: this.close }, React.createElement(Modal.Header, { closeButton: true }, React.createElement(Modal.Title, null, "Modal heading")), React.createElement(Modal.Body, null, React.createElement("form", { role: "form" }, React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "select", label: "Preset:", onChange: this.handlePreset }, React.createElement("option", null, "Select..."), files.map(function (file, i) {
-	      return React.createElement("option", { key: i, value: i }, file.filename);
-	    }))), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "textarea", label: "Headers:", value: current.headers, onChange: this.handleHeaders })), React.createElement(Col, { md: 6 }, React.createElement(Input, { type: "text", label: "File type:", value: current.type, onChange: this.handleType })), React.createElement(Col, { md: 6 }, React.createElement(Input, { type: "text", label: "Status:", value: current.status, onChange: this.handleStatus })), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "textarea", label: "Body:", value: "", rows: 6, value: current.body, onChange: this.handleBody })))), React.createElement(Modal.Footer, null, React.createElement(Button, { onClick: this.close }, "Cancel"), React.createElement(Button, { onClick: this.save }, "Save and Close")));
+	    return selected ? React.createElement(Modal, { show: show, onHide: this.close }, React.createElement(Modal.Header, { closeButton: true }, React.createElement(Modal.Title, null, selected.url.url)), React.createElement(Modal.Body, null, React.createElement("form", { role: "form" }, React.createElement(Col, { md: 12 }, React.createElement("div", { className: "form-group" }, React.createElement("label", null, "Method:"), React.createElement(Nav, { bsStyle: "pills", activeKey: method, onSelect: this.handleMethod }, selected.url.GET ? React.createElement(NavItem, { eventKey: "GET" }, "GET") : null, selected.url.POST ? React.createElement(NavItem, { eventKey: "POST" }, "POST") : null))), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "select", label: "Preset:", onChange: this.handlePreset }, React.createElement("option", null, "Select..."), selected.files[method].map(function (file, i) {
+	      return React.createElement("option", { key: file.filename, value: i }, file.filename);
+	    }))), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "textarea", label: "Headers:", value: current.headers, onChange: this.handleHeaders })), React.createElement(Col, { md: 6 }, React.createElement(Input, { type: "text", label: "File type:", value: current.type, onChange: this.handleType })), React.createElement(Col, { md: 6 }, React.createElement(Input, { type: "text", label: "Status:", value: current.status, onChange: this.handleStatus })), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "textarea", label: "Body:", value: "", rows: 6, value: current.body, onChange: this.handleBody })))), React.createElement(Modal.Footer, null, React.createElement(Button, { onClick: this.close, className: "pull-left" }, "Cancel"), React.createElement(Button, { onClick: this.save, bsStyle: "primary" }, "Save and Close"))) : null;
 	  }
 
 	});
@@ -26518,7 +26535,850 @@ webpackJsonp([0,1],[
 
 	'use strict';
 
-	var BaseStore = __webpack_require__(271);
+	var _extends = __webpack_require__(179)['default'];
+
+	var _interopRequireDefault = __webpack_require__(203)['default'];
+
+	exports.__esModule = true;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _BootstrapMixin = __webpack_require__(253);
+
+	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
+
+	var _Collapse = __webpack_require__(271);
+
+	var _Collapse2 = _interopRequireDefault(_Collapse);
+
+	var _classnames = __webpack_require__(204);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _utilsValidComponentChildren = __webpack_require__(230);
+
+	var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
+
+	var _utilsCreateChainedFunction = __webpack_require__(227);
+
+	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
+
+	var Nav = _react2['default'].createClass({
+	  displayName: 'Nav',
+
+	  mixins: [_BootstrapMixin2['default']],
+
+	  propTypes: {
+	    activeHref: _react2['default'].PropTypes.string,
+	    activeKey: _react2['default'].PropTypes.any,
+	    bsStyle: _react2['default'].PropTypes.oneOf(['tabs', 'pills']),
+	    stacked: _react2['default'].PropTypes.bool,
+	    justified: _react2['default'].PropTypes.bool,
+	    onSelect: _react2['default'].PropTypes.func,
+	    collapsible: _react2['default'].PropTypes.bool,
+	    /**
+	     * CSS classes for the wrapper `nav` element
+	     */
+	    className: _react2['default'].PropTypes.string,
+	    /**
+	     * HTML id for the wrapper `nav` element
+	     */
+	    id: _react2['default'].PropTypes.string,
+	    /**
+	     * CSS classes for the inner `ul` element
+	     */
+	    ulClassName: _react2['default'].PropTypes.string,
+	    /**
+	     * HTML id for the inner `ul` element
+	     */
+	    ulId: _react2['default'].PropTypes.string,
+	    expanded: _react2['default'].PropTypes.bool,
+	    navbar: _react2['default'].PropTypes.bool,
+	    eventKey: _react2['default'].PropTypes.any,
+	    pullRight: _react2['default'].PropTypes.bool,
+	    right: _react2['default'].PropTypes.bool
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      bsClass: 'nav',
+	      collapsible: false,
+	      expanded: true,
+	      justified: false,
+	      navbar: false,
+	      pullRight: false,
+	      right: false,
+	      stacked: false
+	    };
+	  },
+
+	  render: function render() {
+	    var classes = this.props.collapsible ? 'navbar-collapse' : null;
+
+	    if (this.props.navbar && !this.props.collapsible) {
+	      return this.renderUl();
+	    }
+
+	    return _react2['default'].createElement(
+	      _Collapse2['default'],
+	      { 'in': this.props.expanded },
+	      _react2['default'].createElement(
+	        'nav',
+	        _extends({}, this.props, { className: _classnames2['default'](this.props.className, classes) }),
+	        this.renderUl()
+	      )
+	    );
+	  },
+
+	  renderUl: function renderUl() {
+	    var classes = this.getBsClassSet();
+
+	    classes['nav-stacked'] = this.props.stacked;
+	    classes['nav-justified'] = this.props.justified;
+	    classes['navbar-nav'] = this.props.navbar;
+	    classes['pull-right'] = this.props.pullRight;
+	    classes['navbar-right'] = this.props.right;
+
+	    return _react2['default'].createElement(
+	      'ul',
+	      _extends({}, this.props, {
+	        role: this.props.bsStyle === 'tabs' ? 'tablist' : null,
+	        className: _classnames2['default'](this.props.ulClassName, classes),
+	        id: this.props.ulId,
+	        ref: 'ul'
+	      }),
+	      _utilsValidComponentChildren2['default'].map(this.props.children, this.renderNavItem)
+	    );
+	  },
+
+	  getChildActiveProp: function getChildActiveProp(child) {
+	    if (child.props.active) {
+	      return true;
+	    }
+	    if (this.props.activeKey != null) {
+	      if (child.props.eventKey === this.props.activeKey) {
+	        return true;
+	      }
+	    }
+	    if (this.props.activeHref != null) {
+	      if (child.props.href === this.props.activeHref) {
+	        return true;
+	      }
+	    }
+
+	    return child.props.active;
+	  },
+
+	  renderNavItem: function renderNavItem(child, index) {
+	    return _react.cloneElement(child, {
+	      role: this.props.bsStyle === 'tabs' ? 'tab' : null,
+	      active: this.getChildActiveProp(child),
+	      activeKey: this.props.activeKey,
+	      activeHref: this.props.activeHref,
+	      onSelect: _utilsCreateChainedFunction2['default'](child.props.onSelect, this.props.onSelect),
+	      key: child.key ? child.key : index,
+	      navItem: true
+	    });
+	  }
+	});
+
+	exports['default'] = Nav;
+	module.exports = exports['default'];
+
+/***/ },
+/* 271 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _inherits = __webpack_require__(237)['default'];
+
+	var _classCallCheck = __webpack_require__(247)['default'];
+
+	var _extends = __webpack_require__(179)['default'];
+
+	var _interopRequireDefault = __webpack_require__(203)['default'];
+
+	exports.__esModule = true;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactOverlaysLibTransition = __webpack_require__(248);
+
+	var _reactOverlaysLibTransition2 = _interopRequireDefault(_reactOverlaysLibTransition);
+
+	var _utilsDomUtils = __webpack_require__(205);
+
+	var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
+
+	var _utilsCustomPropTypes = __webpack_require__(228);
+
+	var _utilsCustomPropTypes2 = _interopRequireDefault(_utilsCustomPropTypes);
+
+	var _utilsDeprecationWarning = __webpack_require__(251);
+
+	var _utilsDeprecationWarning2 = _interopRequireDefault(_utilsDeprecationWarning);
+
+	var _utilsCreateChainedFunction = __webpack_require__(227);
+
+	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
+
+	var capitalize = function capitalize(str) {
+	  return str[0].toUpperCase() + str.substr(1);
+	};
+
+	// reading a dimension prop will cause the browser to recalculate,
+	// which will let our animations work
+	var triggerBrowserReflow = function triggerBrowserReflow(node) {
+	  return node.offsetHeight;
+	};
+
+	var MARGINS = {
+	  height: ['marginTop', 'marginBottom'],
+	  width: ['marginLeft', 'marginRight']
+	};
+
+	function getDimensionValue(dimension, elem) {
+	  var value = elem['offset' + capitalize(dimension)];
+	  var margins = MARGINS[dimension];
+
+	  return value + parseInt(_utilsDomUtils2['default'].css(elem, margins[0]), 10) + parseInt(_utilsDomUtils2['default'].css(elem, margins[1]), 10);
+	}
+
+	var Collapse = (function (_React$Component) {
+	  _inherits(Collapse, _React$Component);
+
+	  function Collapse(props, context) {
+	    _classCallCheck(this, Collapse);
+
+	    _React$Component.call(this, props, context);
+
+	    this.onEnterListener = this.handleEnter.bind(this);
+	    this.onEnteringListener = this.handleEntering.bind(this);
+	    this.onEnteredListener = this.handleEntered.bind(this);
+	    this.onExitListener = this.handleExit.bind(this);
+	    this.onExitingListener = this.handleExiting.bind(this);
+	  }
+
+	  // Explicitly copied from Transition for doc generation.
+	  // TODO: Remove duplication once #977 is resolved.
+
+	  Collapse.prototype.render = function render() {
+	    var enter = _utilsCreateChainedFunction2['default'](this.onEnterListener, this.props.onEnter);
+	    var entering = _utilsCreateChainedFunction2['default'](this.onEnteringListener, this.props.onEntering);
+	    var entered = _utilsCreateChainedFunction2['default'](this.onEnteredListener, this.props.onEntered);
+	    var exit = _utilsCreateChainedFunction2['default'](this.onExitListener, this.props.onExit);
+	    var exiting = _utilsCreateChainedFunction2['default'](this.onExitingListener, this.props.onExiting);
+
+	    return _react2['default'].createElement(
+	      _reactOverlaysLibTransition2['default'],
+	      _extends({
+	        ref: 'transition'
+	      }, this.props, {
+	        'aria-expanded': this.props.role ? this.props['in'] : null,
+	        className: this._dimension() === 'width' ? 'width' : '',
+	        exitedClassName: 'collapse',
+	        exitingClassName: 'collapsing',
+	        enteredClassName: 'collapse in',
+	        enteringClassName: 'collapsing',
+	        onEnter: enter,
+	        onEntering: entering,
+	        onEntered: entered,
+	        onExit: exit,
+	        onExiting: exiting,
+	        onExited: this.props.onExited
+	      }),
+	      this.props.children
+	    );
+	  };
+
+	  /* -- Expanding -- */
+
+	  Collapse.prototype.handleEnter = function handleEnter(elem) {
+	    var dimension = this._dimension();
+	    elem.style[dimension] = '0';
+	  };
+
+	  Collapse.prototype.handleEntering = function handleEntering(elem) {
+	    var dimension = this._dimension();
+
+	    elem.style[dimension] = this._getScrollDimensionValue(elem, dimension);
+	  };
+
+	  Collapse.prototype.handleEntered = function handleEntered(elem) {
+	    var dimension = this._dimension();
+	    elem.style[dimension] = null;
+	  };
+
+	  /* -- Collapsing -- */
+
+	  Collapse.prototype.handleExit = function handleExit(elem) {
+	    var dimension = this._dimension();
+
+	    elem.style[dimension] = this.props.getDimensionValue(dimension, elem) + 'px';
+	  };
+
+	  Collapse.prototype.handleExiting = function handleExiting(elem) {
+	    var dimension = this._dimension();
+
+	    triggerBrowserReflow(elem);
+	    elem.style[dimension] = '0';
+	  };
+
+	  Collapse.prototype._dimension = function _dimension() {
+	    return typeof this.props.dimension === 'function' ? this.props.dimension() : this.props.dimension;
+	  };
+
+	  //for testing
+
+	  Collapse.prototype._getTransitionInstance = function _getTransitionInstance() {
+	    return this.refs.transition;
+	  };
+
+	  Collapse.prototype._getScrollDimensionValue = function _getScrollDimensionValue(elem, dimension) {
+	    return elem['scroll' + capitalize(dimension)] + 'px';
+	  };
+
+	  return Collapse;
+	})(_react2['default'].Component);
+
+	Collapse.propTypes = {
+	  /**
+	   * Show the component; triggers the expand or collapse animation
+	   */
+	  'in': _react2['default'].PropTypes.bool,
+
+	  /**
+	   * Unmount the component (remove it from the DOM) when it is collapsed
+	   */
+	  unmountOnExit: _react2['default'].PropTypes.bool,
+
+	  /**
+	   * Run the expand animation when the component mounts, if it is initially
+	   * shown
+	   */
+	  transitionAppear: _react2['default'].PropTypes.bool,
+
+	  /**
+	   * Duration of the collapse animation in milliseconds, to ensure that
+	   * finishing callbacks are fired even if the original browser transition end
+	   * events are canceled
+	   */
+	  timeout: _react2['default'].PropTypes.number,
+
+	  /**
+	   * duration
+	   * @private
+	   */
+	  duration: _utilsCustomPropTypes2['default'].all([_react2['default'].PropTypes.number, function (props) {
+	    if (props.duration != null) {
+	      _utilsDeprecationWarning2['default']('Collapse `duration`', 'the `timeout` prop');
+	    }
+	    return null;
+	  }]),
+
+	  /**
+	   * Callback fired before the component expands
+	   */
+	  onEnter: _react2['default'].PropTypes.func,
+	  /**
+	   * Callback fired after the component starts to expand
+	   */
+	  onEntering: _react2['default'].PropTypes.func,
+	  /**
+	   * Callback fired after the component has expanded
+	   */
+	  onEntered: _react2['default'].PropTypes.func,
+	  /**
+	   * Callback fired before the component collapses
+	   */
+	  onExit: _react2['default'].PropTypes.func,
+	  /**
+	   * Callback fired after the component starts to collapse
+	   */
+	  onExiting: _react2['default'].PropTypes.func,
+	  /**
+	   * Callback fired after the component has collapsed
+	   */
+	  onExited: _react2['default'].PropTypes.func,
+
+	  /**
+	   * The dimension used when collapsing, or a function that returns the
+	   * dimension
+	   *
+	   * _Note: Bootstrap only partially supports 'width'!
+	   * You will need to supply your own CSS animation for the `.width` CSS class._
+	   */
+	  dimension: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.oneOf(['height', 'width']), _react2['default'].PropTypes.func]),
+
+	  /**
+	   * Function that returns the height or width of the animating DOM node
+	   *
+	   * Allows for providing some custom logic for how much the Collapse component
+	   * should animate in its specified dimension. Called with the current
+	   * dimension prop value and the DOM node.
+	   */
+	  getDimensionValue: _react2['default'].PropTypes.func,
+
+	  /**
+	   * ARIA role of collapsible element
+	   */
+	  role: _react2['default'].PropTypes.string
+	};
+
+	Collapse.defaultProps = {
+	  'in': false,
+	  timeout: 300,
+	  unmountOnExit: false,
+	  transitionAppear: false,
+
+	  dimension: 'height',
+	  getDimensionValue: getDimensionValue
+	};
+
+	exports['default'] = Collapse;
+	module.exports = exports['default'];
+
+/***/ },
+/* 272 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _objectWithoutProperties = __webpack_require__(193)['default'];
+
+	var _extends = __webpack_require__(179)['default'];
+
+	var _interopRequireDefault = __webpack_require__(203)['default'];
+
+	exports.__esModule = true;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _classnames = __webpack_require__(204);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _BootstrapMixin = __webpack_require__(253);
+
+	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
+
+	var _SafeAnchor = __webpack_require__(273);
+
+	var _SafeAnchor2 = _interopRequireDefault(_SafeAnchor);
+
+	var NavItem = _react2['default'].createClass({
+	  displayName: 'NavItem',
+
+	  mixins: [_BootstrapMixin2['default']],
+
+	  propTypes: {
+	    linkId: _react2['default'].PropTypes.string,
+	    onSelect: _react2['default'].PropTypes.func,
+	    active: _react2['default'].PropTypes.bool,
+	    disabled: _react2['default'].PropTypes.bool,
+	    href: _react2['default'].PropTypes.string,
+	    role: _react2['default'].PropTypes.string,
+	    title: _react2['default'].PropTypes.node,
+	    eventKey: _react2['default'].PropTypes.any,
+	    target: _react2['default'].PropTypes.string,
+	    'aria-controls': _react2['default'].PropTypes.string
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      active: false,
+	      disabled: false
+	    };
+	  },
+
+	  render: function render() {
+	    var _props = this.props;
+	    var role = _props.role;
+	    var linkId = _props.linkId;
+	    var disabled = _props.disabled;
+	    var active = _props.active;
+	    var href = _props.href;
+	    var title = _props.title;
+	    var target = _props.target;
+	    var children = _props.children;
+	    var ariaControls = _props['aria-controls'];
+
+	    var props = _objectWithoutProperties(_props, ['role', 'linkId', 'disabled', 'active', 'href', 'title', 'target', 'children', 'aria-controls']);
+
+	    var classes = {
+	      active: active,
+	      disabled: disabled
+	    };
+	    var linkProps = {
+	      role: role,
+	      href: href,
+	      title: title,
+	      target: target,
+	      id: linkId,
+	      onClick: this.handleClick
+	    };
+
+	    if (!role && href === '#') {
+	      linkProps.role = 'button';
+	    }
+
+	    return _react2['default'].createElement(
+	      'li',
+	      _extends({}, props, { role: 'presentation', className: _classnames2['default'](props.className, classes) }),
+	      _react2['default'].createElement(
+	        _SafeAnchor2['default'],
+	        _extends({}, linkProps, { 'aria-selected': active, 'aria-controls': ariaControls }),
+	        children
+	      )
+	    );
+	  },
+
+	  handleClick: function handleClick(e) {
+	    if (this.props.onSelect) {
+	      e.preventDefault();
+
+	      if (!this.props.disabled) {
+	        this.props.onSelect(this.props.eventKey, this.props.href, this.props.target);
+	      }
+	    }
+	  }
+	});
+
+	exports['default'] = NavItem;
+	module.exports = exports['default'];
+
+/***/ },
+/* 273 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _inherits = __webpack_require__(237)['default'];
+
+	var _classCallCheck = __webpack_require__(247)['default'];
+
+	var _extends = __webpack_require__(179)['default'];
+
+	var _interopRequireDefault = __webpack_require__(203)['default'];
+
+	exports.__esModule = true;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _utilsCreateChainedFunction = __webpack_require__(227);
+
+	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
+
+	/**
+	 * Note: This is intended as a stop-gap for accessibility concerns that the
+	 * Bootstrap CSS does not address as they have styled anchors and not buttons
+	 * in many cases.
+	 */
+
+	var SafeAnchor = (function (_React$Component) {
+	  _inherits(SafeAnchor, _React$Component);
+
+	  function SafeAnchor(props) {
+	    _classCallCheck(this, SafeAnchor);
+
+	    _React$Component.call(this, props);
+
+	    this.handleClick = this.handleClick.bind(this);
+	  }
+
+	  SafeAnchor.prototype.handleClick = function handleClick(event) {
+	    if (this.props.href === undefined) {
+	      event.preventDefault();
+	    }
+	  };
+
+	  SafeAnchor.prototype.render = function render() {
+	    return _react2['default'].createElement('a', _extends({ role: this.props.href ? undefined : 'button'
+	    }, this.props, {
+	      onClick: _utilsCreateChainedFunction2['default'](this.props.onClick, this.handleClick),
+	      href: this.props.href || '' }));
+	  };
+
+	  return SafeAnchor;
+	})(_react2['default'].Component);
+
+	exports['default'] = SafeAnchor;
+
+	SafeAnchor.propTypes = {
+	  href: _react2['default'].PropTypes.string,
+	  onClick: _react2['default'].PropTypes.func
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 274 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _objectWithoutProperties = __webpack_require__(193)['default'];
+
+	var _extends = __webpack_require__(179)['default'];
+
+	var _interopRequireDefault = __webpack_require__(203)['default'];
+
+	exports.__esModule = true;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _classnames = __webpack_require__(204);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _BootstrapMixin = __webpack_require__(253);
+
+	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
+
+	var _Collapse = __webpack_require__(271);
+
+	var _Collapse2 = _interopRequireDefault(_Collapse);
+
+	var Panel = _react2['default'].createClass({
+	  displayName: 'Panel',
+
+	  mixins: [_BootstrapMixin2['default']],
+
+	  propTypes: {
+	    collapsible: _react2['default'].PropTypes.bool,
+	    onSelect: _react2['default'].PropTypes.func,
+	    header: _react2['default'].PropTypes.node,
+	    id: _react2['default'].PropTypes.string,
+	    footer: _react2['default'].PropTypes.node,
+	    defaultExpanded: _react2['default'].PropTypes.bool,
+	    expanded: _react2['default'].PropTypes.bool,
+	    eventKey: _react2['default'].PropTypes.any,
+	    headerRole: _react2['default'].PropTypes.string,
+	    panelRole: _react2['default'].PropTypes.string
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      bsClass: 'panel',
+	      bsStyle: 'default',
+	      defaultExpanded: false
+	    };
+	  },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      expanded: this.props.defaultExpanded
+	    };
+	  },
+
+	  handleSelect: function handleSelect(e) {
+	    e.selected = true;
+
+	    if (this.props.onSelect) {
+	      this.props.onSelect(e, this.props.eventKey);
+	    } else {
+	      e.preventDefault();
+	    }
+
+	    if (e.selected) {
+	      this.handleToggle();
+	    }
+	  },
+
+	  handleToggle: function handleToggle() {
+	    this.setState({ expanded: !this.state.expanded });
+	  },
+
+	  isExpanded: function isExpanded() {
+	    return this.props.expanded != null ? this.props.expanded : this.state.expanded;
+	  },
+
+	  render: function render() {
+	    var _props = this.props;
+	    var headerRole = _props.headerRole;
+	    var panelRole = _props.panelRole;
+
+	    var props = _objectWithoutProperties(_props, ['headerRole', 'panelRole']);
+
+	    return _react2['default'].createElement(
+	      'div',
+	      _extends({}, props, {
+	        className: _classnames2['default'](this.props.className, this.getBsClassSet()),
+	        id: this.props.collapsible ? null : this.props.id, onSelect: null }),
+	      this.renderHeading(headerRole),
+	      this.props.collapsible ? this.renderCollapsibleBody(panelRole) : this.renderBody(),
+	      this.renderFooter()
+	    );
+	  },
+
+	  renderCollapsibleBody: function renderCollapsibleBody(panelRole) {
+	    var props = {
+	      className: this.prefixClass('collapse'),
+	      id: this.props.id,
+	      ref: 'panel',
+	      'aria-hidden': !this.isExpanded()
+	    };
+	    if (panelRole) {
+	      props.role = panelRole;
+	    }
+
+	    return _react2['default'].createElement(
+	      _Collapse2['default'],
+	      { 'in': this.isExpanded() },
+	      _react2['default'].createElement(
+	        'div',
+	        props,
+	        this.renderBody()
+	      )
+	    );
+	  },
+
+	  renderBody: function renderBody() {
+	    var allChildren = this.props.children;
+	    var bodyElements = [];
+	    var panelBodyChildren = [];
+	    var bodyClass = this.prefixClass('body');
+
+	    function getProps() {
+	      return { key: bodyElements.length };
+	    }
+
+	    function addPanelChild(child) {
+	      bodyElements.push(_react.cloneElement(child, getProps()));
+	    }
+
+	    function addPanelBody(children) {
+	      bodyElements.push(_react2['default'].createElement(
+	        'div',
+	        _extends({ className: bodyClass }, getProps()),
+	        children
+	      ));
+	    }
+
+	    function maybeRenderPanelBody() {
+	      if (panelBodyChildren.length === 0) {
+	        return;
+	      }
+
+	      addPanelBody(panelBodyChildren);
+	      panelBodyChildren = [];
+	    }
+
+	    // Handle edge cases where we should not iterate through children.
+	    if (!Array.isArray(allChildren) || allChildren.length === 0) {
+	      if (this.shouldRenderFill(allChildren)) {
+	        addPanelChild(allChildren);
+	      } else {
+	        addPanelBody(allChildren);
+	      }
+	    } else {
+
+	      allChildren.forEach((function (child) {
+	        if (this.shouldRenderFill(child)) {
+	          maybeRenderPanelBody();
+
+	          // Separately add the filled element.
+	          addPanelChild(child);
+	        } else {
+	          panelBodyChildren.push(child);
+	        }
+	      }).bind(this));
+
+	      maybeRenderPanelBody();
+	    }
+
+	    return bodyElements;
+	  },
+
+	  shouldRenderFill: function shouldRenderFill(child) {
+	    return _react2['default'].isValidElement(child) && child.props.fill != null;
+	  },
+
+	  renderHeading: function renderHeading(headerRole) {
+	    var header = this.props.header;
+
+	    if (!header) {
+	      return null;
+	    }
+
+	    if (!_react2['default'].isValidElement(header) || Array.isArray(header)) {
+	      header = this.props.collapsible ? this.renderCollapsibleTitle(header, headerRole) : header;
+	    } else {
+	      var className = _classnames2['default'](this.prefixClass('title'), header.props.className);
+
+	      if (this.props.collapsible) {
+	        header = _react.cloneElement(header, {
+	          className: className,
+	          children: this.renderAnchor(header.props.children, headerRole)
+	        });
+	      } else {
+	        header = _react.cloneElement(header, { className: className });
+	      }
+	    }
+
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: this.prefixClass('heading') },
+	      header
+	    );
+	  },
+
+	  renderAnchor: function renderAnchor(header, headerRole) {
+	    return _react2['default'].createElement(
+	      'a',
+	      {
+	        href: '#' + (this.props.id || ''),
+	        'aria-controls': this.props.collapsible ? this.props.id : null,
+	        className: this.isExpanded() ? null : 'collapsed',
+	        'aria-expanded': this.isExpanded(),
+	        'aria-selected': this.isExpanded(),
+	        onClick: this.handleSelect,
+	        role: headerRole },
+	      header
+	    );
+	  },
+
+	  renderCollapsibleTitle: function renderCollapsibleTitle(header, headerRole) {
+	    return _react2['default'].createElement(
+	      'h4',
+	      { className: this.prefixClass('title'), role: 'presentation' },
+	      this.renderAnchor(header, headerRole)
+	    );
+	  },
+
+	  renderFooter: function renderFooter() {
+	    if (!this.props.footer) {
+	      return null;
+	    }
+
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: this.prefixClass('footer') },
+	      this.props.footer
+	    );
+	  }
+	});
+
+	exports['default'] = Panel;
+	module.exports = exports['default'];
+
+/***/ },
+/* 275 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var BaseStore = __webpack_require__(276);
 	var assign = __webpack_require__(175);
 	var AppDispatcher = __webpack_require__(171);
 	var Constants = __webpack_require__(176);
@@ -26559,13 +27419,13 @@ webpackJsonp([0,1],[
 	module.exports = Store;
 
 /***/ },
-/* 271 */
+/* 276 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var assign = __webpack_require__(175);
-	var EventEmitter = __webpack_require__(272).EventEmitter;
+	var EventEmitter = __webpack_require__(277).EventEmitter;
 
 	var CHANGE_EVENT = 'change';
 
@@ -26587,7 +27447,7 @@ webpackJsonp([0,1],[
 	});
 
 /***/ },
-/* 272 */
+/* 277 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.

@@ -3,19 +3,28 @@ var Modal = require('react-bootstrap/lib/Modal');
 var Button = require('react-bootstrap/lib/Button');
 var Input = require('react-bootstrap/lib/Input');
 var Col = require('react-bootstrap/lib/Col');
+var Nav = require('react-bootstrap/lib/Nav');
+var NavItem = require('react-bootstrap/lib/NavItem');
+var Panel = require('react-bootstrap/lib/Panel');
 var ActionCreator = require('MockServerUI/actions/ActionCreator');
 
 var Popup = React.createClass({
   getInitialState: function() {
     return {
-      current: {}
+      current: {},
+      method: "GET"
     };
   },
 
   componentWillReceiveProps: function(nextProps) {
     let {selected} = nextProps;
-    if (selected && selected.url && selected.url.data) {
-      this.setCurrent(selected.url.data);
+    if (selected && selected.url && selected.url) {
+      let method = "GET";
+      if (!selected.url.GET) {
+        method = "POST";
+      }
+      this.setState({method: method});
+      this.setCurrent(selected.url[method]);
     }
   },
 
@@ -32,8 +41,9 @@ var Popup = React.createClass({
   handlePreset(e) {
     let {value} = e.target;
     let {files} = this.props.selected;
+    let {method} = this.state;
 
-    let selected = files[value];
+    let selected = files[method][value];
 
     this.setCurrent(selected.data);
   },
@@ -71,41 +81,53 @@ var Popup = React.createClass({
     this.setState({current: current});
   },
 
+  handleMethod(method) {
+    this.setState({method: method});
+    let {selected} = this.props;
+    this.setCurrent(selected.url[method]);
+  },
+
   save() {
     let {selected} = this.props;
-    let {current} = this.state;
+    let {current, method} = this.state;
     current.headers = JSON.parse(current.headers);
     current.body = JSON.parse(current.body);
-    ActionCreator.save(selected, current);
+    ActionCreator.save(selected, current, method);
     this.close();
   },
 
   render: function() {
     let {selected} = this.props;
-    let {current} = this.state;
+    let {current, method} = this.state;
+
     let show = false;
     if (selected) {
       show = true;
     }
 
-    let files = [];
-    if (selected && selected.files) {
-      files = selected.files;
-    }
-
     return (
+      selected ?
       <Modal show={show} onHide={this.close}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>{selected.url.url}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
 
           <form role="form">
             <Col md={12}>
+              <div className="form-group">
+                <label>Method:</label>
+                <Nav bsStyle='pills' activeKey={method} onSelect={this.handleMethod}>
+                  {selected.url.GET ? <NavItem eventKey="GET">GET</NavItem> : null}
+                  {selected.url.POST ? <NavItem eventKey="POST">POST</NavItem> : null}
+                </Nav>
+              </div>
+            </Col>
+            <Col md={12}>
               <Input type="select" label="Preset:" onChange={this.handlePreset}>
                 <option>Select...</option>
-                {files.map((file, i) =>
-                  <option key={i} value={i}>{file.filename}</option>
+                {selected.files[method].map((file, i) =>
+                  <option key={file.filename} value={i}>{file.filename}</option>
                 )}
               </Input>
             </Col>
@@ -125,10 +147,11 @@ var Popup = React.createClass({
 
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.close}>Cancel</Button>
-          <Button onClick={this.save}>Save and Close</Button>
+          <Button onClick={this.close} className="pull-left">Cancel</Button>
+          <Button onClick={this.save} bsStyle='primary'>Save and Close</Button>
         </Modal.Footer>
       </Modal>
+      : null
     );
   }
 

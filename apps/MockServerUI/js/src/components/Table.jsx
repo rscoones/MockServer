@@ -11,10 +11,12 @@ var Table = React.createClass({
     let {urls} = this.props;
 
     return (
-      <table className="table">
+      <table className="table table-striped">
         <thead>
           <tr>
             <th>Available URLs</th>
+            <th>GET</th>
+            <th>POST</th>
           </tr>
         </thead>
         <tbody id="list">
@@ -22,6 +24,12 @@ var Table = React.createClass({
             <tr key={url.url}>
               <td>
                 <a href="#" onClick={this.handleClick.bind(this, url)}>{url.url}</a>
+              </td>
+              <td>
+                {url.GET ? <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> : null}
+              </td>
+              <td>
+                {url.POST ? <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> : null}
               </td>
             </tr>
           )}

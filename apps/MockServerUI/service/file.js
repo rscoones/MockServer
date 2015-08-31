@@ -11,7 +11,7 @@ module.exports = {
 function get(url) {
   try {
     if (url) {
-      return {files: getFiles(url)};
+      return getFiles(url);
     } else {
       return {urls: getDirectories()};
     }
@@ -22,21 +22,26 @@ function get(url) {
 
 function getFiles(url) {
   var files = walk(path.join(config.base.location, url));
-  var arr = [];
+  var obj = {
+    GET: [],
+    POST: []
+  };
 
   for (var i in files) {
     var file = files[i];
     if (file.folder === "/") {
       file.folder = url;
-      arr.push(file);
+      obj[file.method].push(file);
     }
   }
 
-  arr.sort(function(a, b) {
-    return a.filename > b.filename;
+  Object.keys(obj).forEach(function(key) {
+    obj[key].sort(function(a, b) {
+      return a.filename > b.filename;
+    });
   });
 
-  return arr;
+  return obj;
 }
 
 function getDirectories() {
@@ -78,11 +83,11 @@ function directory(arr, file) {
     }
   }
   if (!found) {
-    var req = {path: file.folder, method: file.method};
-    found = {url: file.folder, data: response.get(req)};
+    found = {url: file.folder};
     arr.push(found);
   }
-  found[file.method] = true;
+  var req = {path: file.folder, method: file.method};
+  found[file.method] = response.get(req);
 }
 
 function file(filename, base) {
@@ -94,7 +99,7 @@ function file(filename, base) {
 
   return {
     filename: filename.replace(base, ""),
-    folder: filename.replace(base, "").replace(/GET.*/, ""),
+    folder: filename.replace(base, "").replace(/GET.*/, "").replace(/POST.*/, ""),
     method: method,
     data: require(path.join(filename))
   }
