@@ -1,7 +1,7 @@
 module.exports = {
-  "headers": [],
-  "status": 200,
-  "body": {
+  headers: [],
+  status: 403,
+  body: {
     success: false
   }
 };

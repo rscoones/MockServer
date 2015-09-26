@@ -3,8 +3,8 @@ var path = require('path');
 module.exports = {
   port: 7070,
   base: {
-    url: "",
-    location: path.join(__dirname, "../api/")
+    url: "/api",
+    location: path.join(__dirname, "./api/")
   },
   overrides: [
     {

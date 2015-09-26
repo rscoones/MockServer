@@ -105,54 +105,56 @@ var Popup = React.createClass({
       show = true;
     }
 
-    return (
-      selected ?
-      <Modal show={show} onHide={this.close}>
-        <Modal.Header closeButton>
-          <Modal.Title>{selected.url.url}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+    if (selected) {
+      return (
+        <Modal show={show} onHide={this.close}>
+          <Modal.Header closeButton>
+            <Modal.Title>{selected.url.url}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
 
-          <form role="form">
-            <Col md={12}>
-              <div className="form-group">
-                <label>Method:</label>
-                <Nav bsStyle='pills' activeKey={method} onSelect={this.handleMethod}>
-                  {selected.url.GET ? <NavItem eventKey="GET">GET</NavItem> : null}
-                  {selected.url.POST ? <NavItem eventKey="POST">POST</NavItem> : null}
-                </Nav>
-              </div>
-            </Col>
-            <Col md={12}>
-              <Input type="select" label="Preset:" onChange={this.handlePreset}>
-                <option>Select...</option>
-                {selected.files[method].map((file, i) =>
-                  <option key={file.filename} value={i}>{file.filename}</option>
-                )}
-              </Input>
-            </Col>
-            <Col md={12}>
-              <Input type='textarea' label='Headers:' value={current.headers} onChange={this.handleHeaders} />
-            </Col>
-            <Col md={6}>
-              <Input type="text" label="File type:" value={current.type} onChange={this.handleType} />
-            </Col>
-            <Col md={6}>
-              <Input type="text" label="Status:" value={current.status} onChange={this.handleStatus} />
-            </Col>
-            <Col md={12}>
-              <Input type='textarea' label='Body:' value="" rows={6} value={current.body} onChange={this.handleBody} />
-            </Col>
-          </form>
+            <form role="form">
+              <Col md={12}>
+                <div className="form-group">
+                  <label>Method:</label>
+                  <Nav bsStyle='pills' activeKey={method} onSelect={this.handleMethod}>
+                    {selected.url.GET ? <NavItem eventKey="GET">GET</NavItem> : null}
+                    {selected.url.POST ? <NavItem eventKey="POST">POST</NavItem> : null}
+                  </Nav>
+                </div>
+              </Col>
+              <Col md={12}>
+                <Input type="select" label="Preset:" onChange={this.handlePreset}>
+                  <option>Select...</option>
+                  {selected.files[method].map((file, i) =>
+                    <option key={file.filename} value={i}>{file.filename}</option>
+                  )}
+                </Input>
+              </Col>
+              <Col md={12}>
+                <Input type='textarea' label='Headers:' value={current.headers} onChange={this.handleHeaders} />
+              </Col>
+              <Col md={6}>
+                <Input type="text" label="File type:" value={current.type} onChange={this.handleType} />
+              </Col>
+              <Col md={6}>
+                <Input type="text" label="Status:" value={current.status} onChange={this.handleStatus} />
+              </Col>
+              <Col md={12}>
+                <Input type='textarea' label='Body:' rows={6} value={current.body} onChange={this.handleBody} />
+              </Col>
+            </form>
 
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={this.close} className="pull-left">Cancel</Button>
-          <Button onClick={this.save} bsStyle='primary'>Save and Close</Button>
-        </Modal.Footer>
-      </Modal>
-      : null
-    );
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.close} className="pull-left">Cancel</Button>
+            <Button onClick={this.save} bsStyle='primary'>Save and Close</Button>
+          </Modal.Footer>
+        </Modal>
+      );
+    } else {
+      return null;
+    }
   }
 
 });

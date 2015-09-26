@@ -21,6 +21,7 @@ function send(req, res, obj) {
   if (!obj.status) {
     obj.status = 200;
   }
+  res.status(obj.status);
   res.send(obj.body);
 
   if (found(obj)) {

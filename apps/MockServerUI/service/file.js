@@ -16,6 +16,7 @@ function get(url) {
       return {urls: getDirectories()};
     }
   } catch (e) {
+    console.log(e);
     return {error: "Not Found"};
   }
 }
@@ -36,9 +37,7 @@ function getFiles(url) {
   }
 
   Object.keys(obj).forEach(function(key) {
-    obj[key].sort(function(a, b) {
-      return a.filename > b.filename;
-    });
+    sortAlpha(obj[key], "filename");
   });
 
   return obj;
@@ -53,9 +52,7 @@ function getDirectories() {
     directory(directories, file);
   }
 
-  directories.sort(function(a, b) {
-    return a.url > b.url;
-  });
+  sortAlpha(directories, "url");
 
   return directories;
 }
@@ -86,7 +83,7 @@ function directory(arr, file) {
     found = {url: file.folder};
     arr.push(found);
   }
-  var req = {path: file.folder, method: file.method};
+  var req = {path: config.base.url + file.folder, method: file.method};
   found[file.method] = response.get(req);
 }
 
@@ -103,4 +100,16 @@ function file(filename, base) {
     method: method,
     data: require(path.join(filename))
   }
+}
+
+function sortAlpha(arr, key) {
+  arr.sort(function(a, b) {
+    if (a[key] > b[key]) {
+      return 1;
+    } else if (a[key] < b[key]) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
 }
