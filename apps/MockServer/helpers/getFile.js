@@ -22,7 +22,7 @@ function getFilename(req, config, folder) {
     filename = override;
   } else {
     var url = config.base.url;
-    url = url.replace(/\//g, "\\");
+    url = url.replace(/\//g, path.sep);
     filename = filename.replace(url, "");
     filename += "/" + req.method;
   }
@@ -33,7 +33,7 @@ function getFilename(req, config, folder) {
 function checkOverrides(config, folder) {
   for (var i in config.overrides) {
     var override = config.overrides[i];
-    var url = override.url.replace(/\//g, "\\");
+    var url = override.url.replace(/\//g, path.sep);
     if (folder.indexOf(url) > -1) {
       return override.location;
     }
