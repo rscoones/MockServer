@@ -13,7 +13,11 @@ var Table = React.createClass({
 
   getFullURL(url) {
     let tooltip = url.fullURL.replace(url.url, "/");
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> ae07fa22912cfd27745b99927e12a3ba7777c25f
     if (tooltip.length > 0) {
       return <Tooltip>{tooltip}</Tooltip>
     } else {
