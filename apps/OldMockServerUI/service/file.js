@@ -1,18 +1,17 @@
 var path = require('path');
+var config = require('../../MockServer/config');
 var response = require('../../MockServer/service/response');
 
 var walk = require('../helpers/walk');
 var parseWalk = require('../helpers/parseWalk');
 var sortAlpha = require('../helpers/sortAlpha');
 
-var config = {};
 var _data = {};
 module.exports = {
   get: get
 };
 
-function get(url, conf) {
-  config = conf;
+function get(url) {
   try {
     if (url) {
       return getURL(url);
@@ -73,5 +72,5 @@ function directory(arr, file) {
     arr.push(found);
   }
   var req = {path: config.base.url + file.folder, method: file.method};
-  found[file.method] = response.get(req, config);
+  found[file.method] = response.get(req);
 }

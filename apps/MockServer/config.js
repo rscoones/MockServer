@@ -1,9 +1,15 @@
 var path = require('path');
 
 module.exports = {
-  "base": {
+  base: {
     url: "",
-    location: path.join(__dirname, "../MockServerExample/api/")
+    location: path.join(__dirname, "../../example/api/")
   },
-  "port": 8080
+  port: 8080,
+  plugins: [
+    {
+      url: "/portal/",
+      location: path.join(__dirname, "../MockServerUI/GET")
+    }
+  ]
 }

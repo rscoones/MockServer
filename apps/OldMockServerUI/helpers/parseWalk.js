@@ -15,7 +15,6 @@ function addFile(filename, base) {
     method = "POST";
   }
   filename = filename.replace(".js", "");
-  console.log(filename);
 
   return {
     filename: filename.replace(base, ""),

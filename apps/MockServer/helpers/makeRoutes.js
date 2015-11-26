@@ -5,6 +5,26 @@ var walk = require('./walk');
 var NotFound = require('../responses/NotFound');
 
 module.exports = function(app, config) {
+
+  makeFromPlugins(app, config);
+  makeFromFiles(app, config);
+
+  app.use("/", function(req, res) {
+    respond(req, res, NotFound(req));
+  });
+}
+
+function makeFromPlugins(app, config) {
+  config.plugins.forEach(function(plugin) {
+    var route = plugin.url;
+
+    app.use(route, function(req, res) {
+      respond(req, res, require(plugin.location)(req, config));
+    });
+  });
+}
+
+function makeFromFiles(app, config) {
   var files = walk(config.base.location);
 
   files.forEach(function(file) {
@@ -21,10 +41,6 @@ module.exports = function(app, config) {
 
       response.set(route, method, data);
     }
-  });
-
-  app.use("/", function(req, res) {
-    respond(req, res, NotFound(req));
   });
 }
 

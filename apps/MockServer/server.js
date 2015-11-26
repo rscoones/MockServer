@@ -1,33 +1,34 @@
 'use strict';
+// vendor
 var express = require('express');
-
-var config = require('./config');
-var response = require('./service/response');
-var respond = require('./helpers/respond');
-
 var bodyParser = require('body-parser');
+// helpers
+var validateConfig = require('./helpers/validateConfig');
+var makeRoutes = require('./helpers/makeRoutes');
 
 module.exports = {
-  start: function(conf) {
-    for (var i in conf) {
-      config[i] = conf[i];
-    }
+  start: function(config) {
+    validateConfig(config)
 
-    var app = express();
-
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-
-    app.use(function(req, res) {
-      respond(req, res, response.get(req, config));
-    });
-
-
-    var server = app.listen(config.port, function () {
-      console.log("");
-      console.log("==============================================");
-      console.log('Mock server running at: http://localhost:%s', config.port);
-      console.log("==============================================");
-    });
+    var app = createServer();
+    makeRoutes(app, config);
+    startServer(app, config);
   }
 };
+
+function createServer() {
+  var app = express();
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+
+  return app;
+}
+
+function startServer(app, config) {
+  var server = app.listen(config.port, function () {
+    console.log("");
+    console.log("==============================================");
+    console.log('Mock server running at: http://localhost:%s', config.port);
+    console.log("==============================================");
+  });
+}
