@@ -33,13 +33,13 @@ function makeFromFiles(app, config) {
     if (method) {
       var route = "/" + file.folder.replace(file.base, "").replace(/\\/g, "/");
       route = route.replace(/_([a-z]*)_/g, ":$1");
+      route = config.base.url.replace(/\/$/, "") + route;
       var data = require(path.join(file.folder, file.file.replace(".js", "")));
+      response.set(route, method, data);
 
       app[method.toLowerCase()](route, function(req, res) {
         respond(req, res, response.get(req, config, route));
       });
-
-      response.set(route, method, data);
     }
   });
 }
@@ -51,6 +51,10 @@ function getMethod(file) {
       return "GET";
     case "POST":
       return "POST";
+    case "PUT":
+      return "PUT";
+    case "DELETE":
+      return "DELETE";
     default:
       return null;
   }

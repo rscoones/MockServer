@@ -1,15 +1,15 @@
 var path = require('path');
 
 module.exports = {
-  port: 7070,
   base: {
-    url: "/api",
-    location: path.join(__dirname, "./api/")
+    url: "",
+    location: path.join(__dirname, "../example/api/")
   },
-  overrides: [
+  port: 8080,
+  plugins: [
     {
       url: "/portal/",
-      location: path.join(__dirname, "../apps/MockServerUI/GET")
+      location: path.join(__dirname, "../MockServerUI/GET")
     }
   ]
 }
