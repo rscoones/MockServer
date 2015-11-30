@@ -7,7 +7,7 @@ module.exports = {
   load() {
     xhr({
       method: "GET",
-      uri: "api/"
+      uri: "api"
     }, function (err, resp, body) {
       let data = JSON.parse(resp.body);
       AppDispatcher.handleViewAction({
@@ -21,7 +21,7 @@ module.exports = {
       let query = qs.stringify({url: url.url});
       xhr({
         method: "GET",
-        uri: "api/?" + query
+        uri: "api?" + query
       }, function (err, resp, body) {
         let data = JSON.parse(resp.body);
         _setSelected(data, url);
@@ -35,7 +35,7 @@ module.exports = {
     var data = {url: selected.url.url, method: method, data: JSON.stringify(obj)};
     xhr({
       method: "POST",
-      uri: "api/",
+      uri: "api",
       json: data
     }, function (err, resp, body) {
       this.load();

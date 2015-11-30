@@ -26,7 +26,7 @@ function getFile(req, config) {
   }
   var filename = path.join(__dirname, "..", url);
 
-  if (url === "/api/") {
+  if (url === "/api") {
     return require(path.join(filename, req.method))(req, config);
   } else {
     return fs.readFileSync(filename);
