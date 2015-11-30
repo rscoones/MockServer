@@ -4,7 +4,7 @@ module.exports = function(req, resp, config) {
     status: 200,
     body: {
       firstName: "Bob",
-      surName: "Smith",
+      surName: "Params",
       type: req.params.id
     }
   };

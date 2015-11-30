@@ -26,6 +26,8 @@ function get(url, conf) {
 }
 
 function getURL(url) {
+  url = url.replace(/:([a-z]*)/g, "_$1_");
+  console.log(url);
   var files = parseWalk(walk(path.join(config.base.location, url)));
   var obj = {
     GET: [],
@@ -62,6 +64,7 @@ function getAll() {
 }
 
 function directory(arr, file) {
+  file.folder = file.folder.replace(/_([a-z]*)_/g, ":$1");
   var found = null;
   for (var i in arr) {
     if (arr[i].url === file.folder) {
@@ -72,6 +75,6 @@ function directory(arr, file) {
     found = {url: file.folder, fullURL: config.base.url + file.folder};
     arr.push(found);
   }
-  var req = {path: config.base.url + file.folder, method: file.method};
+  var req = {path: config.base.url + file.folder, method: file.method, params: {}};
   found[file.method] = response.get(req, config);
 }
