@@ -33,11 +33,6 @@ function set(url, method, data) {
 }
 
 function getUrl(url) {
-  // if (url[url.length-1] === "/") {
-  //   url = url.substr(0, url.length-1);
-  //   console.log(url);
-  // }
-
   if (!_data[url]) {
     _data[url] = {};
   }
