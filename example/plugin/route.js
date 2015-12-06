@@ -22,5 +22,5 @@ function getResponse(req, config) {
 
 function getExtention(req) {
   var url = req.path;
-  return path.extname(url).substring(1);
+  return path.extname(url).substring(1) || "html";
 }
