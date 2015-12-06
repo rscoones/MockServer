@@ -13,6 +13,11 @@ An example folder structure:
     /user/_id_/GET.js
 ```
 
+These files will create 3 entry points:
+GET:  `/api/user`
+POST: `/api/user`
+GET:  `/api/user/:id`  (e.g. `/api/user/123`)
+
 
 ##Files
 Mock files can be created in one of 2 ways, as a JavaScript object or as a function that returns an object.

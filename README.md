@@ -41,7 +41,7 @@ module.exports = {
   }
 }
 ```
-[Creating mocking files](docs/mockfiles.md)
+[Creating mock files](docs/mockfiles.md)
 
 #Release Notes
 
