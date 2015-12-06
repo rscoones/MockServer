@@ -5,8 +5,9 @@ var walk = require('./walk');
 var NotFound = require('../responses/NotFound');
 
 module.exports = function(app, config) {
-
-  makeFromPlugins(app, config);
+  if (config.plugins && Array.isArray(config.plugins)) {
+    makeFromPlugins(app, config);
+  }
   makeFromFiles(app, config);
 
   app.use("/", function(req, res) {

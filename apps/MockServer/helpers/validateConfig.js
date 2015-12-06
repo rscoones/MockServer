@@ -6,6 +6,7 @@ module.exports = function(config) {
     throw "Config Error: 'base.location' property required";
   }
   if (!config.port) {
-    throw "Config Error: 'port' property required";
+    config.port = 8080
+    console.warn("Config warning: Port not set, defaulting to 8080")
   }
 }
