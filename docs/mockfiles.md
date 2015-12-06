@@ -14,9 +14,9 @@ An example folder structure:
 ```
 
 These files will create 3 entry points:
-GET:  `/api/user`
-POST: `/api/user`
-GET:  `/api/user/:id`  (e.g. `/api/user/123`)
+- GET:  `/api/user`
+- POST: `/api/user`
+- GET:  `/api/user/:id`  (e.g. `/api/user/123`)
 
 
 ##Files
