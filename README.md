@@ -48,6 +48,7 @@ module.exports = {
 ##v0.2
 - Support for dynamic URLs using express routing via req.params
 - Support for multiple HTTP verbs
+- Documentation
 
 ##v0.1
 - First Creation
@@ -58,6 +59,7 @@ module.exports = {
 ##Planned
 
 #### v0.3
+- async responding via promises
 - Support for user context based queries via cookie/sessions
 - Automatic raml parsing
 - npm packaging
