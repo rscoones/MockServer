@@ -15,7 +15,7 @@ var Table = React.createClass({
     let tooltip = url.fullURL.replace(url.url, "/");
 
     if (tooltip.length > 0) {
-      return <Tooltip>{tooltip}</Tooltip>
+      return <Tooltip id={url.url}>{tooltip}</Tooltip>
     } else {
       return <div></div>
     }
