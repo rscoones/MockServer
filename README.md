@@ -12,9 +12,10 @@ Simple quick mocking server running on node
 
 
 ##Planned
-###v0.3
+
+### v0.3
 - Support for user context based queries via cookie/sessions
 - Automatic raml parsing
-###v0.4
+### v0.4
 - UI extensions => Create new URLs in flight
 - UI extensions => Save newly created URLs in flight
