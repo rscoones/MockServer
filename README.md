@@ -5,6 +5,16 @@ Simple quick mocking server running on node
 ```
   require('./apps/MockServer/server.js').start(config);
 ```
+or
+```
+  var gulp = require('gulp');
+  var MockServer = require('./apps/MockServer/server.js');
+  var config = require('./config.js');
+
+  gulp.task('mock', function() {
+    MockServer.start(config);
+  })
+```
 
 ###Example config:
 Create a server serving a folder 'api' at http://localhost:8080/api/...
@@ -18,34 +28,8 @@ module.exports = {
   }
 }
 ```
+[Further details here](docs/config.md)
 
-####port
-```
-  ...
-  port: 8080
-  ...
-```
-
-####plugins
-Creates an entry point for the MockServerUI plugin at http://localhost:8080/portal/
-```
-  ...
-  plugins: [
-    {
-      url: "/portal/",
-      location: path.join(__dirname, "../apps/MockServerUI/GET")
-    }
-  ]
-  ...
-```
-
-####cors
-Support for Cross-Origin Resource Sharing. Unless you use a proxy within our main server, you will need this.
-```
-  ...
-  cors: true
-  ...
-```
 
 #Release Notes
 
@@ -64,6 +48,7 @@ Support for Cross-Origin Resource Sharing. Unless you use a proxy within our mai
 #### v0.3
 - Support for user context based queries via cookie/sessions
 - Automatic raml parsing
+- npm packaging
 
 #### v0.4
 - UI extensions => Create new URLs in flight
