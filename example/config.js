@@ -10,6 +10,10 @@ module.exports = {
     {
       url: "/portal/",
       location: path.join(__dirname, "../apps/MockServerUI/GET")
+    },
+    {
+      url: "/plugin/",
+      location: path.join(__dirname, "plugin/route")
     }
   ]
 }
