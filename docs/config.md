@@ -16,14 +16,14 @@ module.exports = {
 
 ##Extra options
 
-####port
+####port {number}
 ```
   ...
   port: 8080
   ...
 ```
 
-####plugins
+####plugins {Array}
 Creates an entry point for the MockServerUI plugin at http://localhost:8080/portal/
 ```
   ...
@@ -36,7 +36,7 @@ Creates an entry point for the MockServerUI plugin at http://localhost:8080/port
   ...
 ```
 
-####cors
+####cors {bool}
 Support for Cross-Origin Resource Sharing. Unless you use a proxy within your main server, you will need this.
 ```
   ...

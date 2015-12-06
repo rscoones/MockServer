@@ -28,8 +28,20 @@ module.exports = {
   }
 }
 ```
-[Further details here](docs/config.md)
+[Extra config settings](docs/config.md)
 
+###Mock file
+A mock file is a simple JS object with 4 properties, all optional!
+```
+module.exports = {
+  headers: {},
+  status: 200,
+  body: {
+    success: true
+  }
+}
+```
+[Creating mocking files](docs/mockfiles.md)
 
 #Release Notes
 
