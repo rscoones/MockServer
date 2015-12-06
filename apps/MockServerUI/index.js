@@ -1,12 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 
-module.exports = {
-  get: get
-}
-
-function get(req, config) {
-
+module.exports = function(req, config) {
   return {
     headers: {},
     status: 200,
@@ -24,10 +19,10 @@ function getFile(req, config) {
   if (url === "/") {
     url = "/index.html";
   }
-  var filename = path.join(__dirname, "..", url);
+  var filename = path.join(__dirname, "public", url);
 
   if (url === "/api") {
-    return require(path.join(filename, req.method))(req, config);
+    return require(path.join(filename, "../../api", req.method))(req, config);
   } else {
     return fs.readFileSync(filename);
   }
@@ -35,10 +30,5 @@ function getFile(req, config) {
 
 function getExtention(req) {
   var url = req.path;
-  var extension = url.split(".")[1];
-  if (extension && extension.length > 0) {
-    return extension;
-  } else {
-    return "html";
-  }
+  return path.extname(url).substring(1);
 }

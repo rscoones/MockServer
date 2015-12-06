@@ -27,5 +27,5 @@ build/Release
 node_modules
 
 # Built files
-apps/MockServerUI/index.js
-apps/MockServerUI/vendor.js
+apps/MockServerUI/public/index.js
+apps/MockServerUI/public/vendor.js

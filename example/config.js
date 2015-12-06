@@ -9,7 +9,7 @@ module.exports = {
   plugins: [
     {
       url: "/portal/",
-      location: path.join(__dirname, "../apps/MockServerUI/GET")
+      location: path.join(__dirname, "../apps/MockServerUI")
     },
     {
       url: "/plugin/",
