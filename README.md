@@ -27,6 +27,8 @@ module.exports = {
 }
 ```
 
+#Release Notes
+
 ##v0.2
 - Support for dynamic URLs using express routing via req.params
 - Support for multiple HTTP verbs
