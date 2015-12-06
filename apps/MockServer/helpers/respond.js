@@ -1,6 +1,17 @@
 var found = require('./found');
+var Q = require('q');
 
 module.exports = function(req, res, obj) {
+  if (Q.isPromise(obj)) {
+    obj.then(function(data) {
+      respond(req, res, data);
+    })
+  } else {
+    respond(req, res, obj);
+  }
+}
+
+function respond(req, res, obj) {
   setHeaders(res, obj.headers);
   setType(res, obj.type);
   send(req, res, obj);

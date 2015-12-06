@@ -20,7 +20,7 @@ These files will create 3 entry points:
 
 
 ##Files
-Mock files can be created in one of 2 ways, as a JavaScript object or as a function that returns an object.
+Mock files can be created in one of a few ways.
 
 ###Object approach
 Simplest and quickest way to return your mocked API
@@ -49,3 +49,25 @@ module.exports = function(req, config) {
 }
 ```
 The request object can be used to find anything from query strings to cookies to request headers.
+
+###Using promises
+Sometimes you might want to hold the server response until you have completed an async task. If your file returns a promise, this can be achieved.
+Q is used internally but any promise/A+ will resolve fine.
+```
+var Q = require('q');
+module.exports = function(req, config) {
+  var obj = {
+    headers: [],
+    status: 200,
+    body: {test: "deferred"}
+  };
+
+  var deferred = Q.defer();
+
+  setTimeout(function() {
+    deferred.resolve(obj);
+  }, 2000)
+
+  return deferred.promise;
+};
+```
