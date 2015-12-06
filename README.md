@@ -8,7 +8,6 @@ Simple quick mocking server running on node
 
 ###Example config:
 Create a server serving a folder 'api' at http://localhost:8080/api/...
-Also creates MockServerUI plugin at http://localhost:8080/portal/
 ```
 var path = require('path');
 
@@ -16,15 +15,36 @@ module.exports = {
   base: {
     url: "/api",
     location: path.join(__dirname, "api")
-  },
-  port: 8080,
+  }
+}
+```
+
+####port
+```
+  ...
+  port: 8080
+  ...
+```
+
+####plugins
+Creates an entry point for the MockServerUI plugin at http://localhost:8080/portal/
+```
+  ...
   plugins: [
     {
       url: "/portal/",
       location: path.join(__dirname, "../apps/MockServerUI/GET")
     }
   ]
-}
+  ...
+```
+
+####cors
+Support for Cross-Origin Resource Sharing. Unless you use a proxy within our main server, you will need this.
+```
+  ...
+  cors: true
+  ...
 ```
 
 #Release Notes
