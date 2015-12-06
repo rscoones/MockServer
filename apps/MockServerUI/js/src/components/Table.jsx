@@ -1,9 +1,9 @@
-var React = require('react');
-var ActionCreator = require('MockServerUI/actions/ActionCreator');
+let React = require('react');
+let ActionCreator = require('MockServerUI/actions/ActionCreator');
 
-
-var Tooltip = require('react-bootstrap/lib/Tooltip');
-var OverlayTrigger = require('react-bootstrap/lib/OverlayTrigger');
+let Tooltip = require('react-bootstrap/lib/Tooltip');
+let OverlayTrigger = require('react-bootstrap/lib/OverlayTrigger');
+let verbs = require('MockServerUI/helpers/verbs')
 
 var Table = React.createClass({
 
@@ -13,7 +13,7 @@ var Table = React.createClass({
 
   getFullURL(url) {
     let tooltip = url.fullURL.replace(url.url, "/");
-    
+
     if (tooltip.length > 0) {
       return <Tooltip>{tooltip}</Tooltip>
     } else {
@@ -29,8 +29,9 @@ var Table = React.createClass({
         <thead>
           <tr>
             <th>Available URLs</th>
-            <th>GET</th>
-            <th>POST</th>
+            {verbs.map((verb, i) =>
+              <th key={i}>{verb}</th>
+            )}
           </tr>
         </thead>
         <tbody id="list">
@@ -41,12 +42,11 @@ var Table = React.createClass({
                   <a href="#" onClick={this.handleClick.bind(this, url)}>{url.url}</a>
                 </OverlayTrigger>
               </td>
-              <td>
-                {url.GET ? <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> : null}
-              </td>
-              <td>
-                {url.POST ? <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> : null}
-              </td>
+              {verbs.map((verb, i) =>
+                <td key={i}>
+                  {url[verb] ? <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> : null}
+                </td>
+              )}
             </tr>
           )}
         </tbody>

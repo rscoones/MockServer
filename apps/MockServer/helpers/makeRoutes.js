@@ -46,16 +46,10 @@ function makeFromFiles(app, config) {
 
 function getMethod(file) {
   var method = file.file.replace(".js", "");
-  switch (method) {
-    case "GET":
-      return "GET";
-    case "POST":
-      return "POST";
-    case "PUT":
-      return "PUT";
-    case "DELETE":
-      return "DELETE";
-    default:
-      return null;
+  var verbs = require('./verbs');
+  if (verbs.indexOf(method) > -1) {
+    return method;
+  } else {
+    return null;
   }
 }

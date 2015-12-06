@@ -2,6 +2,7 @@
 // vendor
 var express = require('express');
 var bodyParser = require('body-parser');
+var cors = require('cors');
 // helpers
 var validateConfig = require('./helpers/validateConfig');
 var makeRoutes = require('./helpers/makeRoutes');
@@ -11,6 +12,9 @@ module.exports = {
     validateConfig(config)
 
     var app = createServer();
+    if (config.cors) {
+      app.use(cors());
+    }
     makeRoutes(app, config);
     startServer(app, config);
   }

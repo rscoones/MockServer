@@ -1,4 +1,5 @@
 var path = require('path');
+var verbs = require('./verbs');
 
 module.exports = function(files) {
   var arr = [];
@@ -10,15 +11,19 @@ module.exports = function(files) {
 }
 
 function addFile(filename, base) {
-  var method = "GET";
-  if (filename.indexOf("POST") > -1) {
-    method = "POST";
+  var method;
+  for (var i = 0; verbs.length; i++) {
+    if (filename.indexOf(verbs[i]) > -1) {
+      method = verbs[i];
+      break;
+    }
   }
+
   filename = filename.replace(".js", "");
 
   return {
     filename: filename.replace(base, ""),
-    folder: filename.replace(base, "").replace(/GET.*/, "").replace(/POST.*/, ""),
+    folder: path.dirname(filename.replace(base, "")),
     method: method,
     data: require(path.join(filename))
   };

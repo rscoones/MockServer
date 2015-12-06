@@ -4,6 +4,7 @@ var response = require('../../MockServer/service/response');
 var walk = require('../helpers/walk');
 var parseWalk = require('../helpers/parseWalk');
 var sortAlpha = require('../helpers/sortAlpha');
+var verbs = require('../helpers/verbs');
 
 var config = {};
 var _data = {};
@@ -28,10 +29,10 @@ function get(url, conf) {
 function getURL(url) {
   url = url.replace(/:([a-zA-Z]*)/g, "_$1_");
   var files = parseWalk(walk(path.join(config.base.location, url)));
-  var obj = {
-    GET: [],
-    POST: []
-  };
+  var obj = {};
+  verbs.forEach(function(verb) {
+    obj[verb] = [];
+  })
 
   for (var i in files) {
     var file = files[i];

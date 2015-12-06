@@ -7,6 +7,7 @@ var Nav = require('react-bootstrap/lib/Nav');
 var NavItem = require('react-bootstrap/lib/NavItem');
 var Panel = require('react-bootstrap/lib/Panel');
 var ActionCreator = require('MockServerUI/actions/ActionCreator');
+let verbs = require('MockServerUI/helpers/verbs')
 
 var Popup = React.createClass({
   getInitialState: function() {
@@ -19,9 +20,12 @@ var Popup = React.createClass({
   componentWillReceiveProps: function(nextProps) {
     let {selected} = nextProps;
     if (selected && selected.url && selected.url) {
-      let method = "GET";
-      if (!selected.url.GET) {
-        method = "POST";
+      let method = null;
+      for (var i = 0; i < verbs.length; i++) {
+        if (selected.url[verbs[i]]) {
+          method = verbs[i];
+          break;
+        }
       }
       this.setState({method: method});
       this.setCurrent(selected.url[method]);
@@ -118,8 +122,9 @@ var Popup = React.createClass({
                 <div className="form-group">
                   <label>Method:</label>
                   <Nav bsStyle='pills' activeKey={method} onSelect={this.handleMethod}>
-                    {selected.url.GET ? <NavItem eventKey="GET">GET</NavItem> : null}
-                    {selected.url.POST ? <NavItem eventKey="POST">POST</NavItem> : null}
+                    {verbs.map((verb, i) =>
+                      selected.url[verb] ? <NavItem key={i} eventKey={verb}>{verb}</NavItem> : null
+                    )}
                   </Nav>
                 </div>
               </Col>
