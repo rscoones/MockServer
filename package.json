@@ -18,7 +18,6 @@
     "body-parser": "^1.13.3",
     "cors": "^2.7.1",
     "express": "^4.13.1",
-    "express-http-proxy": "^0.6.0",
     "flux": "^2.1.1",
     "gulp": "^3.8.7",
     "jsx-loader": "^0.13.2",
