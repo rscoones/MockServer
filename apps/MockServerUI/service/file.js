@@ -12,11 +12,11 @@ module.exports = {
   get: get
 };
 
-function get(url, conf) {
+function get(req, conf) {
   config = conf;
   try {
-    if (url) {
-      return getURL(url);
+    if (req.query.url) {
+      return getURL(req.query.url);
     } else {
       return {urls: getAll()};
     }
@@ -50,32 +50,24 @@ function getURL(url) {
 }
 
 function getAll() {
-  var files = parseWalk(walk(config.base.location));
-  var directories = [];
+  var available = response.urls();
 
-  for (var i in files) {
-    var file = files[i];
-    directory(directories, file);
-  }
+  var files = [];
+  Object.keys(available).forEach(function(url) {
+    var file = {
+      url: url.replace(config.base.url, ""),
+      fullURL: url
+    };
 
-  sortAlpha(directories, "url");
+    var methods = available[url];
+    Object.keys(methods).forEach(function(method) {
+      var fakeReq = {path: url, method: method, params: {}};
+      file[method] = response.get(fakeReq, config);
+    });
+    files.push(file);
+  });
 
-  return directories;
-}
+  sortAlpha(files, "url");
 
-function directory(arr, file) {
-  file.folder = file.folder.replace(/_([a-zA-Z]*)_/g, ":$1");
-  file.folder = file.folder.replace(/\/$/, "");
-  var found = null;
-  for (var i in arr) {
-    if (arr[i].url === file.folder) {
-      found = arr[i];
-    }
-  }
-  if (!found) {
-    found = {url: file.folder, fullURL: config.base.url + file.folder};
-    arr.push(found);
-  }
-  var req = {path: config.base.url + file.folder, method: file.method, params: {}};
-  found[file.method] = response.get(req, config);
+  return files;
 }
