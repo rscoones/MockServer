@@ -35,14 +35,13 @@ function createServer() {
 function sessionfy(app, config) {
   var session = require('express-session');
 
-  var sess = config || {};
-  setValue(sess, 'secret', "keyboard cat");
-  setValue(sess, 'name', "MockServer");
-  setValue(sess, 'cookie', {secure: false});
-  setValue(sess, 'resave', false);
-  setValue(sess, 'saveUninitialized', true);
+  setValue(config, 'secret', "keyboard cat");
+  setValue(config, 'name', "MockServer");
+  setValue(config, 'cookie', {secure: false});
+  setValue(config, 'resave', false);
+  setValue(config, 'saveUninitialized', true);
 
-  app.use(session(sess));
+  app.use(session(config));
 
   function setValue(obj, key, defaultValue) {
     if(typeof obj[key] === "undefined") {
