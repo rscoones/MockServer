@@ -11,7 +11,7 @@ module.exports = {
   start: function(config) {
     validateConfig(config)
 
-    var app = createServer(config);
+    var app = createServer();
     if (config.session) {
       sessionfy(app, config.session);
     }
@@ -35,15 +35,20 @@ function createServer() {
 function sessionfy(app, config) {
   var session = require('express-session');
 
-  var secret = config.secret || 'keyboard cat';
-  var secure = config.cookie ? config.cookie.secure : false;
+  var sess = config || {};
+  setValue(sess, 'secret', "keyboard cat");
+  setValue(sess, 'name', "MockServer");
+  setValue(sess, 'cookie', {secure: false});
+  setValue(sess, 'resave', false);
+  setValue(sess, 'saveUninitialized', true);
 
-  app.use(session({
-    secret: secret,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: secure }
-  }));
+  app.use(session(sess));
+
+  function setValue(obj, key, defaultValue) {
+    if(typeof obj[key] === "undefined") {
+      obj[key] = defaultValue;
+    }
+  }
 }
 
 function startServer(app, config) {
