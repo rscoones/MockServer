@@ -1,18 +1,19 @@
+var session = require('./context');
+
 var _data = {};
+var _available = {};
 
 module.exports = {
   get: get,
+  urls: urls,
   isSet: isSet,
   set: set,
   data: _data
 };
 
-function get(req, config, url) {
-  if (!url) {
-    url = req.path;
-  }
+function get(req, config) {
 
-  var page = getUrl(url)[req.method];
+  var page = getData(req)[req.method];
 
   if (typeof page === "function") {
     page = page(req, config);
@@ -21,20 +22,54 @@ function get(req, config, url) {
   return page;
 }
 
-function isSet(url, method) {
-  if (!getUrl(url)[method]) {
+function urls() {
+  return _available;
+}
+
+function isSet(req, method) {
+  if (!getData(req)[method]) {
     return false;
   }
   return true;
 }
 
-function set(url, method, data) {
-  getUrl(url)[method] = data;
+function set(req, method, data) {
+  getData(req)[method] = data;
+  getAvailable(req)[method] = true;
 }
 
-function getUrl(url) {
+function getData(req) {
+  var url = req.path;
+  var context = "base";
   if (!_data[url]) {
     _data[url] = {};
+    _data[url][context] = {};
   }
-  return _data[url];
+
+  if (session(req)) {
+    context = session(req);
+    if (!_data[url][context]) {
+      _data[url][context] = copyFromBase(url);
+    }
+  }
+
+  return _data[url][context];
+}
+
+function getAvailable(req) {
+  var url = req.path;
+  if (!_available[url]) {
+    _available[url] = {};
+  }
+  return _available[url];
+}
+
+function copyFromBase(url) {
+  var base = getData({path: url});
+
+  var copy = {};
+  for (var i in base) {
+    copy[i] = base[i];
+  }
+  return copy;
 }

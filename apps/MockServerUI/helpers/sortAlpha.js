@@ -8,4 +8,6 @@ module.exports = function(arr, key) {
       return 0;
     }
   });
+
+  return arr;
 };

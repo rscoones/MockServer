@@ -12,6 +12,9 @@ module.exports = {
     validateConfig(config)
 
     var app = createServer();
+    if (config.session) {
+      sessionfy(app, config.session);
+    }
     if (config.cors) {
       app.use(cors());
     }
@@ -22,10 +25,29 @@ module.exports = {
 
 function createServer() {
   var app = express();
+
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
   return app;
+}
+
+function sessionfy(app, config) {
+  var session = require('express-session');
+
+  setValue(config, 'secret', "keyboard cat");
+  setValue(config, 'name', "MockServer");
+  setValue(config, 'cookie', {secure: false});
+  setValue(config, 'resave', false);
+  setValue(config, 'saveUninitialized', true);
+
+  app.use(session(config));
+
+  function setValue(obj, key, defaultValue) {
+    if(typeof obj[key] === "undefined") {
+      obj[key] = defaultValue;
+    }
+  }
 }
 
 function startServer(app, config) {

@@ -1,7 +1,6 @@
-module.exports = function() {
-  var context = 0;
-  this.set = function(value) {
-    context = value;
+module.exports = function(req) {
+  if (req.session) {
+    return req.session.id;
   }
-  return context;
+  return null;
 }

@@ -1,9 +1,11 @@
 var response = require('../../MockServer/service/response');
 
 module.exports = function(req, config) {
-  var obj = req.body;
-  obj.url = config.base.url + obj.url;
-  response.set(obj.url, obj.method, JSON.parse(obj.data));
+  var mockServerReq = {path: config.base.url + req.body.url, session: req.session};
+  var method = req.body.method;
+  var data = JSON.parse(req.body.data);
+
+  response.set(mockServerReq, method, data);
 
   return {success: true};
 }
