@@ -20,7 +20,7 @@ function makeFromPlugins(app, config) {
     var route = plugin.url;
 
     app.use(route, function(req, res) {
-      respond(req, res, require(plugin.location)(req, config));
+      require(plugin.location)(req, res, config);
     });
   });
 }
