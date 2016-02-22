@@ -39,7 +39,7 @@ function set(req, method, data) {
 }
 
 function getData(req) {
-  var url = req.path;
+  var url = req.route ? req.route.path : req.path;
   var context = "base";
   if (!_data[url]) {
     _data[url] = {};
@@ -57,7 +57,7 @@ function getData(req) {
 }
 
 function getAvailable(req) {
-  var url = req.path;
+  var url = req.route ? req.route.path : req.path;
   if (!_available[url]) {
     _available[url] = {};
   }
