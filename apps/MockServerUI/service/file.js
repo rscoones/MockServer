@@ -18,7 +18,7 @@ function get(req, conf) {
     if (req.query.url) {
       return getURL(req.query.url);
     } else {
-      return {urls: getAll()};
+      return {urls: getAll(req)};
     }
   } catch (e) {
     console.log(e);
@@ -49,7 +49,7 @@ function getURL(url) {
   return obj;
 }
 
-function getAll() {
+function getAll(req) {
   var available = response.urls();
 
   var files = [];
@@ -61,7 +61,7 @@ function getAll() {
 
     var methods = available[url];
     Object.keys(methods).forEach(function(method) {
-      var fakeReq = {path: url, method: method, params: {}};
+      var fakeReq = {path: url, method: method, params: {}, session: req.session};
       file[method] = response.get(fakeReq, config);
     });
     files.push(file);
