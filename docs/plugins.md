@@ -1,3 +1,3 @@
 #Plugins
 ##How to
-Coming soon... (or just look at UI)
+Docs coming soon... (or just look at UI)

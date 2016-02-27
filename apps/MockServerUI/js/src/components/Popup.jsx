@@ -7,7 +7,7 @@ var Nav = require('react-bootstrap/lib/Nav');
 var NavItem = require('react-bootstrap/lib/NavItem');
 var Panel = require('react-bootstrap/lib/Panel');
 var ActionCreator = require('MockServerUI/actions/ActionCreator');
-let verbs = require('MockServerUI/helpers/verbs')
+var Store = require('MockServerUI/stores/Store');
 
 var Popup = React.createClass({
   getInitialState: function() {
@@ -21,6 +21,7 @@ var Popup = React.createClass({
     let {selected} = nextProps;
     if (selected && selected.url && selected.url) {
       let method = null;
+      let verbs = Store.getVerbs();
       for (var i = 0; i < verbs.length; i++) {
         if (selected.url[verbs[i]]) {
           method = verbs[i];
@@ -103,6 +104,7 @@ var Popup = React.createClass({
   render: function() {
     let {selected} = this.props;
     let {current, method} = this.state;
+    let verbs = Store.getVerbs();
 
     let show = false;
     if (selected) {

@@ -11,12 +11,12 @@ module.exports = {
   data: _data
 };
 
-function get(req, config) {
+function get(req) {
 
   var page = getData(req)[req.method];
 
   if (typeof page === "function") {
-    page = page(req, config);
+    page = page(req);
   }
 
   return page;

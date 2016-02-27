@@ -1,1 +1,1 @@
-module.exports = require('../../MockServer/helpers/verbs');
+module.exports = require('../../MockServer/config').verbs;

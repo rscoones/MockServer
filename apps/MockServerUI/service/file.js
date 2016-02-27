@@ -1,28 +1,21 @@
 var path = require('path');
 var response = require('../../MockServer/service/response');
+var config = require('../../MockServer/config');
 
 var walk = require('../helpers/walk');
 var parseWalk = require('../helpers/parseWalk');
 var sortAlpha = require('../helpers/sortAlpha');
 var verbs = require('../helpers/verbs');
 
-var config = {};
-var _data = {};
 module.exports = {
   get: get
 };
 
-function get(req, conf) {
-  config = conf;
-  try {
-    if (req.query.url) {
-      return getURL(req.query.url);
-    } else {
-      return {urls: getAll(req)};
-    }
-  } catch (e) {
-    console.log(e);
-    return {error: "Not Found"};
+function get(req) {
+  if (req.query.url) {
+    return getURL(req.query.url);
+  } else {
+    return {urls: getAll(req), verbs: verbs};
   }
 }
 

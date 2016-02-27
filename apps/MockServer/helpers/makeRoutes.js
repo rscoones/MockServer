@@ -2,30 +2,31 @@ var path = require('path');
 var response = require('../service/response');
 var respond = require('./respond');
 var walk = require('./walk');
-var NotFound = require('../responses/NotFound');
+var NotFound = require('./responses/NotFound');
+var config = require('../config');
 
-module.exports = function(app, config) {
+module.exports = function(app) {
   if (config.plugins && Array.isArray(config.plugins)) {
-    makeFromPlugins(app, config);
+    makeFromPlugins(app);
   }
-  makeFromFiles(app, config);
+  makeFromFiles(app);
 
   app.use("/", function(req, res) {
     respond(req, res, NotFound(req));
   });
 }
 
-function makeFromPlugins(app, config) {
+function makeFromPlugins(app) {
   config.plugins.forEach(function(plugin) {
     var route = plugin.url;
 
     app.use(route, function(req, res) {
-      require(plugin.location)(req, res, config);
+      require(plugin.location)(req, res);
     });
   });
 }
 
-function makeFromFiles(app, config) {
+function makeFromFiles(app) {
   var files = walk(config.base.location);
 
   files.forEach(function(file) {
@@ -39,7 +40,7 @@ function makeFromFiles(app, config) {
       response.set({path: route}, method, data);
 
       app[method.toLowerCase()](route, function(req, res) {
-        respond(req, res, response.get(req, config, route));
+        respond(req, res, response.get(req));
       });
     }
   });
@@ -47,8 +48,7 @@ function makeFromFiles(app, config) {
 
 function getMethod(file) {
   var method = file.file.replace(".js", "");
-  var verbs = require('./verbs');
-  if (verbs.indexOf(method) > -1) {
+  if (config.verbs.indexOf(method) > -1) {
     return method;
   } else {
     return null;

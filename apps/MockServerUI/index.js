@@ -1,15 +1,15 @@
 var path = require('path');
 
-module.exports = function(req, res, config) {
+module.exports = function(req, res) {
   if (req.path.indexOf("/api") === 0) {
-    sendAPI(req, res, config);
+    sendAPI(req, res);
   } else {
     sendFile(req, res);
   }
 }
 
-function sendAPI(req, res, config) {
-  var response = require(path.join(__dirname, "api", req.method))(req, config);
+function sendAPI(req, res) {
+  var response = require(path.join(__dirname, "api", req.method))(req);
   res.json(response);
 }
 
