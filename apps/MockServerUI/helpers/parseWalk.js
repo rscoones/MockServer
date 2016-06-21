@@ -4,27 +4,29 @@ var verbs = require('./verbs');
 module.exports = function(files) {
   var arr = [];
   files.forEach(function(file) {
-    arr.push(addFile(file.name, file.base));
+    addFile(arr, file);
   });
 
   return arr;
 }
 
-function addFile(filename, base) {
+function addFile(arr, file) {
   var method;
-  for (var i = 0; verbs.length; i++) {
-    if (filename.indexOf(verbs[i]) > -1) {
+  for (var i = 0; i < verbs.length; i++) {
+    if (file.file.indexOf(verbs[i]) > -1) {
       method = verbs[i];
       break;
     }
   }
 
-  filename = filename.replace(".js", "");
+  if (method && file.folder.replace(file.base, "") === "") {
+    var filename = file.file.replace(".js", "");
 
-  return {
-    filename: filename.replace(base, ""),
-    folder: path.dirname(filename.replace(base, "")),
-    method: method,
-    data: require(path.join(filename))
-  };
+    arr.push({
+      filename: filename,
+      folder: file.folder,
+      method: method,
+      data: require(path.join(file.folder, filename))
+    });
+  }
 }

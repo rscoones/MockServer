@@ -1,8 +1,8 @@
 var path = require('path');
+var walk = require('rs-filewalk');
 var response = require('../../MockServer/service/response');
 var config = require('../../MockServer/config');
 
-var walk = require('../helpers/walk');
 var parseWalk = require('../helpers/parseWalk');
 var sortAlpha = require('../helpers/sortAlpha');
 var verbs = require('../helpers/verbs');
@@ -22,18 +22,16 @@ function get(req) {
 function getURL(url) {
   url = url.replace(/:([a-zA-Z]*)/g, "_$1_");
   var files = parseWalk(walk(path.join(config.base.location, url)));
+  
   var obj = {};
   verbs.forEach(function(verb) {
     obj[verb] = [];
   })
 
-  for (var i in files) {
-    var file = files[i];
-    if (file.folder === "/") {
-      file.folder = url;
-      obj[file.method].push(file);
-    }
-  }
+  files.forEach(function(file) {
+    file.folder = url;
+    obj[file.method].push(file);
+  });
 
   Object.keys(obj).forEach(function(key) {
     sortAlpha(obj[key], "filename");
