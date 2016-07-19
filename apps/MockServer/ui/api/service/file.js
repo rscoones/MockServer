@@ -4,7 +4,9 @@ var response = MockServer.response;
 var verbs = MockServer.verbs;
 var convert = MockServer.convert;
 
-var walk = require('../helpers/walk');
+var walk = require('rs-filewalk');
+var config = require('../../../config');
+
 var parseWalk = require('../helpers/parseWalk');
 var sortAlpha = require('../helpers/sortAlpha');
 
@@ -12,12 +14,12 @@ module.exports = {
   get: get
 };
 
-function get(req, config) {
+function get(req) {
   try {
     if (req.query.url) {
-      return getURL(config, req.query.url);
+      return getURL(req.query.url);
     } else {
-      return {urls: getAll(config)};
+      return {urls: getAll(req), verbs: verbs};
     }
   } catch (e) {
     console.log(e);
@@ -25,21 +27,19 @@ function get(req, config) {
   }
 }
 
-function getURL(config, url) {
+function getURL(url) {
   url = convert.toFolder(url);
   var files = parseWalk(walk(path.join(config.base.location, url)));
+
   var obj = {};
   verbs.forEach(function(verb) {
     obj[verb] = [];
   })
 
-  for (var i in files) {
-    var file = files[i];
-    if (file.folder === "/") {
-      file.folder = url;
-      obj[file.method].push(file);
-    }
-  }
+  files.forEach(function(file) {
+    file.folder = url;
+    obj[file.method].push(file);
+  });
 
   Object.keys(obj).forEach(function(key) {
     sortAlpha(obj[key], "filename");
@@ -48,7 +48,7 @@ function getURL(config, url) {
   return obj;
 }
 
-function getAll(config) {
+function getAll(req) {
   var available = response.urls();
 
   var files = [];
@@ -60,7 +60,7 @@ function getAll(config) {
 
     var methods = available[url];
     Object.keys(methods).forEach(function(method) {
-      var fakeReq = {path: url, method: method, params: {}};
+      var fakeReq = {path: url, method: method, params: {}, session: req.session};
       file[method] = response.get(fakeReq, config);
     });
     files.push(file);

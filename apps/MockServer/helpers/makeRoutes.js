@@ -2,37 +2,30 @@ var path = require('path');
 var response = require('../service/response');
 var respond = require('./respond');
 var walk = require('./walk');
-var NotFound = require('../responses/NotFound');
+var config = require('../config');
+var NotFound = require('./responses/NotFound');
 var convert = require('./convert/params');
 
-module.exports = function(app, config) {
-  if (!Array.isArray(config.plugins)) {
-    config.plugins = [];
-  }
-  config.plugins.unshift({
-    url: "/portal/",
-    location: path.join(__dirname, "../ui/")
-  });
-
-  makeFromPlugins(app, config);
-  makeFromFiles(app, config);
+module.exports = function(app) {
+  makeFromPlugins(app);
+  makeFromFiles(app);
 
   app.use("/", function(req, res) {
     respond(req, res, NotFound(req));
   });
 }
 
-function makeFromPlugins(app, config) {
+function makeFromPlugins(app) {
   config.plugins.forEach(function(plugin) {
     var route = plugin.url;
 
     app.use(route, function(req, res) {
-      require(plugin.location)(req, res, config);
+      require(plugin.location)(req, res);
     });
   });
 }
 
-function makeFromFiles(app, config) {
+function makeFromFiles(app) {
   var files = walk(config.base.location);
 
   files.forEach(function(file) {
@@ -46,7 +39,7 @@ function makeFromFiles(app, config) {
       response.set({path: route}, method, data);
 
       app[method.toLowerCase()](route, function(req, res) {
-        respond(req, res, response.get(req, config, route));
+        respond(req, res, response.get(req));
       });
     }
   });
@@ -54,8 +47,7 @@ function makeFromFiles(app, config) {
 
 function getMethod(file) {
   var method = file.file.replace(".js", "");
-  var verbs = require('./verbs');
-  if (verbs.indexOf(method) > -1) {
+  if (config.verbs.indexOf(method) > -1) {
     return method;
   } else {
     return null;

@@ -1,5 +1,6 @@
 let React = require('react');
 let ActionCreator = require('MockServerUI/actions/ActionCreator');
+var Store = require('MockServerUI/stores/Store');
 
 let Tooltip = require('react-bootstrap/lib/Tooltip');
 let OverlayTrigger = require('react-bootstrap/lib/OverlayTrigger');
@@ -23,6 +24,7 @@ var Table = React.createClass({
 
   render: function() {
     let {urls} = this.props;
+    let verbs = Store.getVerbs();
 
     return (
       <table className="table table-striped">

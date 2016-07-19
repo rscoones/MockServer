@@ -4,24 +4,25 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 // helpers
-var validateConfig = require('./helpers/validateConfig');
+var initConfig = require('./helpers/config');
 var makeRoutes = require('./helpers/makeRoutes');
+var config = require('./config');
 
 module.exports = {
-  start: function(config) {
-    validateConfig(config);
+  start: function(conf) {
+    initConfig(conf);
 
     var app = createServer();
-    
+
     if (config.session) {
-      sessionfy(app, config.session);
+      sessionfy(app);
     }
     if (config.cors) {
       app.use(cors());
     }
 
-    makeRoutes(app, config);
-    startServer(app, config);
+    makeRoutes(app);
+    startServer(app);
   }
 };
 
@@ -34,16 +35,16 @@ function createServer() {
   return app;
 }
 
-function sessionfy(app, config) {
+function sessionfy(app) {
   var session = require('express-session');
 
-  setValue(config, 'secret', "keyboard cat");
-  setValue(config, 'name', "MockServer");
-  setValue(config, 'cookie', {secure: false});
-  setValue(config, 'resave', false);
-  setValue(config, 'saveUninitialized', true);
+  setValue(config.session, 'secret', "keyboard cat");
+  setValue(config.session, 'name', "MockServer");
+  setValue(config.session, 'cookie', {secure: false});
+  setValue(config.session, 'resave', false);
+  setValue(config.session, 'saveUninitialized', true);
 
-  app.use(session(config));
+  app.use(session(config.session));
 
   function setValue(obj, key, defaultValue) {
     if(typeof obj[key] === "undefined") {
@@ -52,7 +53,7 @@ function sessionfy(app, config) {
   }
 }
 
-function startServer(app, config) {
+function startServer(app) {
   var server = app.listen(config.port, function () {
     console.log("");
     console.log("==============================================");

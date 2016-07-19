@@ -1,5 +1,5 @@
 module.exports = {
   response: require('../../../service/response'),
-  verbs: require('../../../helpers/verbs'),
+  verbs: require('../../../config').verbs,
   convert: require('../../../helpers/convert/params')
 }

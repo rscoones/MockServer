@@ -25,15 +25,17 @@
     "react": "^0.13.3",
     "react-bootstrap": "^0.25.0",
     "require-dir": "^0.3.0",
+    "rs-filewalk": "^1.0.1",
     "webpack": "^1.10.1",
     "xhr": "^2.0.4"
   },
   "dependencies": {
-    "connect-redis": "^3.0.2",
     "body-parser": "^1.13.3",
+    "connect-redis": "^3.0.2",
     "cors": "^2.7.1",
     "express": "^4.13.1",
-    "express-session": "^1.13.0"
+    "express-session": "^1.13.0",
+    "rs-filewalk": "^1.0.1"
   },
   "license": "MIT"
 }

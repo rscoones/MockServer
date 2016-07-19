@@ -12,7 +12,8 @@ module.exports = {
       let data = JSON.parse(resp.body);
       AppDispatcher.handleViewAction({
         type: Constants.ActionTypes.ADD_URLS,
-        urls: data.urls
+        urls: data.urls,
+        verbs: data.verbs
       });
     });
   },
