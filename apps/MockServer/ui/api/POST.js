@@ -1,5 +1,5 @@
 var response = require('./helpers/MockServer').response;
-var config = require('../../config');
+var config = require('./helpers/MockServer').config;
 
 module.exports = function(req) {
   var mockServerReq = {path: config.base.url + req.body.url, session: req.session};

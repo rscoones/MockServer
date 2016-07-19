@@ -3,9 +3,9 @@ var MockServer = require('../helpers/MockServer');
 var response = MockServer.response;
 var verbs = MockServer.verbs;
 var convert = MockServer.convert;
+var config = MockServer.config;
 
 var walk = require('rs-filewalk');
-var config = require('../../../config');
 
 var parseWalk = require('../helpers/parseWalk');
 var sortAlpha = require('../helpers/sortAlpha');
