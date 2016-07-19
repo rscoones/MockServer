@@ -1,24 +1,23 @@
 var path = require('path');
-var response = require('../../MockServer/service/response');
+var MockServer = require('../helpers/MockServer');
+var response = MockServer.response;
+var verbs = MockServer.verbs;
+var convert = MockServer.convert;
 
 var walk = require('../helpers/walk');
 var parseWalk = require('../helpers/parseWalk');
 var sortAlpha = require('../helpers/sortAlpha');
-var verbs = require('../helpers/verbs');
 
-var config = {};
-var _data = {};
 module.exports = {
   get: get
 };
 
-function get(req, conf) {
-  config = conf;
+function get(req, config) {
   try {
     if (req.query.url) {
-      return getURL(req.query.url);
+      return getURL(config, req.query.url);
     } else {
-      return {urls: getAll()};
+      return {urls: getAll(config)};
     }
   } catch (e) {
     console.log(e);
@@ -26,8 +25,8 @@ function get(req, conf) {
   }
 }
 
-function getURL(url) {
-  url = url.replace(/:([a-zA-Z]*)/g, "_$1_");
+function getURL(config, url) {
+  url = convert.toFolder(url);
   var files = parseWalk(walk(path.join(config.base.location, url)));
   var obj = {};
   verbs.forEach(function(verb) {
@@ -49,7 +48,7 @@ function getURL(url) {
   return obj;
 }
 
-function getAll() {
+function getAll(config) {
   var available = response.urls();
 
   var files = [];

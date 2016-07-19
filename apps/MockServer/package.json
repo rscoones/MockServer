@@ -1,11 +1,11 @@
 {
-  "name": "mockserver",
+  "name": "rs-mockserver",
   "version": "0.3.0",
-  "description": "A simple powerful mocking server. Mock APIs or develiver content.",
-  "main": "server.js",
+  "description": "A simple powerful dev server. Mock APIs or develiver content.",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "keywords": [
     "mock",
@@ -17,7 +17,7 @@
     "cors": "^2.7.1",
     "express": "^4.13.1",
     "q": "^1.4.1",
-    "qs": "^5.0.0",
+    "qs": "^5.0.0"
   },
   "author": "Richard Scoones",
   "license": "MIT"

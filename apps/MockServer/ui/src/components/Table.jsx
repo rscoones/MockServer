@@ -3,7 +3,7 @@ let ActionCreator = require('MockServerUI/actions/ActionCreator');
 
 let Tooltip = require('react-bootstrap/lib/Tooltip');
 let OverlayTrigger = require('react-bootstrap/lib/OverlayTrigger');
-let verbs = require('MockServerUI/helpers/verbs')
+let verbs = require('MockServerUI/helpers/verbs');
 
 var Table = React.createClass({
 

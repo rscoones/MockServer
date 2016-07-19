@@ -1,5 +1,6 @@
 var path = require('path');
-var verbs = require('./verbs');
+var verbs = require('../helpers/MockServer').verbs;
+
 
 module.exports = function(files) {
   var arr = [];

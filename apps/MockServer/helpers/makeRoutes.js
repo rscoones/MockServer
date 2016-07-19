@@ -3,11 +3,18 @@ var response = require('../service/response');
 var respond = require('./respond');
 var walk = require('./walk');
 var NotFound = require('../responses/NotFound');
+var convert = require('./convert/params');
 
 module.exports = function(app, config) {
-  if (config.plugins && Array.isArray(config.plugins)) {
-    makeFromPlugins(app, config);
+  if (!Array.isArray(config.plugins)) {
+    config.plugins = [];
   }
+  config.plugins.unshift({
+    url: "/portal/",
+    location: path.join(__dirname, "../ui/")
+  });
+
+  makeFromPlugins(app, config);
   makeFromFiles(app, config);
 
   app.use("/", function(req, res) {
@@ -33,7 +40,7 @@ function makeFromFiles(app, config) {
 
     if (method) {
       var route = "/" + file.folder.replace(file.base, "").replace(/\\/g, "/");
-      route = route.replace(/_([a-zA-Z]*)_/g, ":$1");
+      route = convert.toURL(route)
       route = config.base.url.replace(/\/$/, "") + route;
       var data = require(path.join(file.folder, file.file.replace(".js", "")));
       response.set({path: route}, method, data);

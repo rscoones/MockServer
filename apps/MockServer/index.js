@@ -9,15 +9,17 @@ var makeRoutes = require('./helpers/makeRoutes');
 
 module.exports = {
   start: function(config) {
-    validateConfig(config)
+    validateConfig(config);
 
     var app = createServer();
+    
     if (config.session) {
       sessionfy(app, config.session);
     }
     if (config.cors) {
       app.use(cors());
     }
+
     makeRoutes(app, config);
     startServer(app, config);
   }
