@@ -23,11 +23,18 @@ function addFile(arr, file) {
   if (method && file.folder.replace(file.base, "") === "") {
     var filename = file.file.replace(".js", "");
 
+    var data = require(path.join(file.folder, filename));
+    var isFunction = typeof data === "function";
+    if (isFunction) {
+      data = data({});
+    }
+
     arr.push({
       filename: filename,
       folder: file.folder,
       method: method,
-      data: require(path.join(file.folder, filename))
+      isFunction: isFunction,
+      data: data
     });
   }
 }
