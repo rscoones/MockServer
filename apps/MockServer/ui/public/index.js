@@ -20392,16 +20392,13 @@ webpackJsonp([0,1],[
 
 	var React = __webpack_require__(1);
 	var Table = __webpack_require__(158);
-	var Popup = __webpack_require__(285);
+	var Edit = __webpack_require__(284);
 	var Store = __webpack_require__(177);
 	var ActionCreator = __webpack_require__(159);
 
 	var App = React.createClass({ displayName: "App",
 	  getInitialState: function getInitialState() {
-	    var state = this._getFromStore();
-	    state.show = false;
-
-	    return state;
+	    return this._getFromStore();
 	  },
 
 	  _getFromStore: function _getFromStore() {
@@ -20416,7 +20413,7 @@ webpackJsonp([0,1],[
 	  },
 
 	  componentWillMount: function componentWillMount() {
-	    this.load();
+	    ActionCreator.load();
 	    Store.addChangeListener(this._onChange);
 	  },
 
@@ -20424,16 +20421,12 @@ webpackJsonp([0,1],[
 	    Store.removeChangeListener(this._onChange);
 	  },
 
-	  load: function load() {
-	    ActionCreator.load();
-	  },
-
 	  render: function render() {
 	    var _state = this.state;
 	    var urls = _state.urls;
 	    var selected = _state.selected;
 
-	    return React.createElement("div", { className: "container" }, React.createElement(Table, { onClick: this.showPopup, urls: urls }), React.createElement(Popup, { selected: selected }));
+	    return React.createElement("div", { className: "container" }, selected ? React.createElement(Edit, { selected: selected }) : React.createElement(Table, { urls: urls }));
 	  }
 
 	});
@@ -20452,7 +20445,6 @@ webpackJsonp([0,1],[
 
 	var Tooltip = __webpack_require__(180);
 	var OverlayTrigger = __webpack_require__(207);
-	var verbs = __webpack_require__(284);
 
 	var Table = React.createClass({ displayName: "Table",
 
@@ -20503,10 +20495,12 @@ webpackJsonp([0,1],[
 
 	module.exports = {
 	  load: function load() {
-	    xhr({
+	    var options = {
 	      method: "GET",
 	      uri: "api"
-	    }, function (err, resp, body) {
+	    };
+
+	    xhr(options, function (err, resp, body) {
 	      var data = JSON.parse(resp.body);
 	      AppDispatcher.handleViewAction({
 	        type: Constants.ActionTypes.ADD_URLS,
@@ -20515,13 +20509,16 @@ webpackJsonp([0,1],[
 	      });
 	    });
 	  },
+
 	  select: function select(url) {
 	    if (url) {
 	      var query = qs.stringify({ url: url.url });
-	      xhr({
+	      var options = {
 	        method: "GET",
 	        uri: "api?" + query
-	      }, function (err, resp, body) {
+	      };
+
+	      xhr(options, function (err, resp, body) {
 	        var data = JSON.parse(resp.body);
 	        _setSelected(data, url);
 	      });
@@ -20530,15 +20527,24 @@ webpackJsonp([0,1],[
 	    }
 	  },
 	  save: function save(selected, obj, method) {
+	    var _this = this;
+
 	    console.log(selected, obj);
-	    var data = { url: selected.url.url, method: method, data: JSON.stringify(obj) };
-	    xhr({
+	    var data = {
+	      url: selected.url.url,
+	      method: method,
+	      data: JSON.stringify(obj)
+	    };
+
+	    var options = {
 	      method: "POST",
 	      uri: "api",
 	      json: data
-	    }, (function (err, resp, body) {
-	      this.load();
-	    }).bind(this));
+	    };
+
+	    xhr(options, function (err, resp, body) {
+	      _this.load();
+	    });
 	  }
 	};
 
@@ -20547,6 +20553,7 @@ webpackJsonp([0,1],[
 	  if (files && url) {
 	    selected = { url: url, files: files };
 	  }
+
 	  AppDispatcher.handleViewAction({
 	    type: Constants.ActionTypes.SELECT,
 	    selected: selected
@@ -26917,30 +26924,20 @@ webpackJsonp([0,1],[
 
 /***/ },
 /* 284 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	module.exports = ["GET", "POST", "PUT", "DELETE"];
-
-/***/ },
-/* 285 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(1);
-	var Modal = __webpack_require__(286);
-	var Button = __webpack_require__(300);
-	var Input = __webpack_require__(306);
-	var Col = __webpack_require__(310);
-	var Nav = __webpack_require__(311);
-	var NavItem = __webpack_require__(313);
-	var Panel = __webpack_require__(315);
+	var Button = __webpack_require__(285);
+	var Input = __webpack_require__(291);
+	var Col = __webpack_require__(295);
+	var Nav = __webpack_require__(296);
+	var NavItem = __webpack_require__(301);
 	var ActionCreator = __webpack_require__(159);
 	var Store = __webpack_require__(177);
 
-	var Popup = React.createClass({ displayName: "Popup",
+	var Edit = React.createClass({ displayName: "Edit",
 	  getInitialState: function getInitialState() {
 	    return {
 	      current: {},
@@ -26948,29 +26945,33 @@ webpackJsonp([0,1],[
 	    };
 	  },
 
-	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    var selected = nextProps.selected;
+	  componentWillMount: function componentWillMount() {
+	    var selected = this.props.selected;
 
-	    if (selected && selected.url && selected.url) {
+	    if (selected && selected.url) {
 	      var method = null;
 	      var verbs = Store.getVerbs();
+
 	      for (var i = 0; i < verbs.length; i++) {
-	        if (selected.url[verbs[i]]) {
-	          method = verbs[i];
+	        var verb = verbs[i];
+	        if (selected.url[verb]) {
+	          method = verb;
 	          break;
 	        }
 	      }
+
 	      this.setState({ method: method });
 	      this.setCurrent(selected.url[method]);
 	    }
 	  },
 
 	  setCurrent: function setCurrent(data) {
-	    var current = {};
-	    current.headers = JSON.stringify(data.headers, null, 2);
-	    current.status = data.status;
-	    current.type = data.type;
-	    current.body = JSON.stringify(data.body, null, 2);
+	    var current = {
+	      headers: JSON.stringify(data.headers, null, 2),
+	      status: data.status,
+	      type: data.type,
+	      body: JSON.stringify(data.body, null, 2)
+	    };
 
 	    this.setState({ current: current });
 	  },
@@ -26985,16 +26986,12 @@ webpackJsonp([0,1],[
 	    this.setCurrent(selected.data);
 	  },
 
-	  close: function close() {
-	    this.setState({ current: {} });
-	    ActionCreator.select(null);
-	  },
-
 	  handleHeaders: function handleHeaders(e) {
 	    var value = e.target.value;
 	    var current = this.state.current;
 
 	    current.headers = value;
+
 	    this.setState({ current: current });
 	  },
 
@@ -27003,6 +27000,7 @@ webpackJsonp([0,1],[
 	    var current = this.state.current;
 
 	    current.type = value;
+
 	    this.setState({ current: current });
 	  },
 
@@ -27011,6 +27009,7 @@ webpackJsonp([0,1],[
 	    var current = this.state.current;
 
 	    current.status = value;
+
 	    this.setState({ current: current });
 	  },
 
@@ -27019,6 +27018,7 @@ webpackJsonp([0,1],[
 	    var current = this.state.current;
 
 	    current.body = value;
+
 	    this.setState({ current: current });
 	  },
 
@@ -27041,6 +27041,11 @@ webpackJsonp([0,1],[
 	    this.close();
 	  },
 
+	  close: function close() {
+	    this.setState({ current: {} });
+	    ActionCreator.select(null);
+	  },
+
 	  render: function render() {
 	    var selected = this.props.selected;
 	    var _state2 = this.state;
@@ -27049,1186 +27054,19 @@ webpackJsonp([0,1],[
 
 	    var verbs = Store.getVerbs();
 
-	    var show = false;
-	    if (selected) {
-	      show = true;
-	    }
-
-	    if (selected) {
-	      return React.createElement(Modal, { show: show, onHide: this.close }, React.createElement(Modal.Header, { closeButton: true }, React.createElement(Modal.Title, null, selected.url.url)), React.createElement(Modal.Body, null, React.createElement("form", { role: "form" }, React.createElement(Col, { md: 12 }, React.createElement("div", { className: "form-group" }, React.createElement("label", null, "Method:"), React.createElement(Nav, { bsStyle: "pills", activeKey: method, onSelect: this.handleMethod }, verbs.map(function (verb, i) {
-	        return selected.url[verb] ? React.createElement(NavItem, { key: i, eventKey: verb }, verb) : null;
-	      })))), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "select", label: "Preset:", onChange: this.handlePreset }, React.createElement("option", null, "Select..."), selected.files[method].map(function (file, i) {
-	        return React.createElement("option", { key: file.filename, value: i }, file.filename);
-	      }))), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "textarea", label: "Headers:", value: current.headers, onChange: this.handleHeaders })), React.createElement(Col, { md: 6 }, React.createElement(Input, { type: "text", label: "File type:", value: current.type, onChange: this.handleType })), React.createElement(Col, { md: 6 }, React.createElement(Input, { type: "text", label: "Status:", value: current.status, onChange: this.handleStatus })), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "textarea", label: "Body:", rows: 6, value: current.body, onChange: this.handleBody })))), React.createElement(Modal.Footer, null, React.createElement(Button, { onClick: this.close, className: "pull-left" }, "Cancel"), React.createElement(Button, { onClick: this.save, bsStyle: "primary" }, "Save and Close")));
-	    } else {
-	      return null;
-	    }
+	    return React.createElement("div", null, React.createElement("h3", null, selected.url.fullURL), React.createElement("form", { role: "form" }, React.createElement(Col, { md: 12 }, React.createElement("div", { className: "form-group" }, React.createElement("label", null, "Method:"), React.createElement(Nav, { bsStyle: "pills", activeKey: method, onSelect: this.handleMethod }, verbs.map(function (verb, i) {
+	      return selected.url[verb] ? React.createElement(NavItem, { key: i, eventKey: verb }, verb) : null;
+	    })))), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "select", label: "Preset:", onChange: this.handlePreset }, React.createElement("option", null, "Select..."), selected.files[method].map(function (file, i) {
+	      return React.createElement("option", { key: file.filename, value: i }, file.filename);
+	    }))), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "textarea", label: "Headers:", value: current.headers, onChange: this.handleHeaders })), React.createElement(Col, { md: 6 }, React.createElement(Input, { type: "text", label: "File type:", value: current.type, onChange: this.handleType })), React.createElement(Col, { md: 6 }, React.createElement(Input, { type: "text", label: "Status:", value: current.status, onChange: this.handleStatus })), React.createElement(Col, { md: 12 }, React.createElement(Input, { type: "textarea", label: "Body:", rows: 6, value: current.body, onChange: this.handleBody }))), React.createElement(Button, { onClick: this.close, className: "pull-left" }, "Cancel"), React.createElement(Button, { onClick: this.save, bsStyle: "primary" }, "Save and Close"));
 	  }
 
 	});
 
-	module.exports = Popup;
+	module.exports = Edit;
 
 /***/ },
-/* 286 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*eslint-disable react/prop-types */
-	'use strict';
-
-	var _extends = __webpack_require__(181)['default'];
-
-	var _objectWithoutProperties = __webpack_require__(222)['default'];
-
-	var _Object$isFrozen = __webpack_require__(287)['default'];
-
-	var _Object$keys = __webpack_require__(201)['default'];
-
-	var _interopRequireDefault = __webpack_require__(196)['default'];
-
-	exports.__esModule = true;
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _classnames = __webpack_require__(197);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _utilsDomUtils = __webpack_require__(290);
-
-	var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
-
-	var _domHelpersUtilScrollbarSize = __webpack_require__(293);
-
-	var _domHelpersUtilScrollbarSize2 = _interopRequireDefault(_domHelpersUtilScrollbarSize);
-
-	var _utilsEventListener = __webpack_require__(294);
-
-	var _utilsEventListener2 = _interopRequireDefault(_utilsEventListener);
-
-	var _utilsCreateChainedFunction = __webpack_require__(208);
-
-	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
-
-	var _utilsCustomPropTypes = __webpack_require__(200);
-
-	var _utilsCustomPropTypes2 = _interopRequireDefault(_utilsCustomPropTypes);
-
-	var _reactOverlaysLibPortal = __webpack_require__(225);
-
-	var _reactOverlaysLibPortal2 = _interopRequireDefault(_reactOverlaysLibPortal);
-
-	var _Fade = __webpack_require__(255);
-
-	var _Fade2 = _interopRequireDefault(_Fade);
-
-	var _ModalDialog = __webpack_require__(295);
-
-	var _ModalDialog2 = _interopRequireDefault(_ModalDialog);
-
-	var _ModalBody = __webpack_require__(296);
-
-	var _ModalBody2 = _interopRequireDefault(_ModalBody);
-
-	var _ModalHeader = __webpack_require__(297);
-
-	var _ModalHeader2 = _interopRequireDefault(_ModalHeader);
-
-	var _ModalTitle = __webpack_require__(298);
-
-	var _ModalTitle2 = _interopRequireDefault(_ModalTitle);
-
-	var _ModalFooter = __webpack_require__(299);
-
-	var _ModalFooter2 = _interopRequireDefault(_ModalFooter);
-
-	/**
-	 * Gets the correct clientHeight of the modal container
-	 * when the body/window/document you need to use the docElement clientHeight
-	 * @param  {HTMLElement} container
-	 * @param  {ReactElement|HTMLElement} context
-	 * @return {Number}
-	 */
-	function containerClientHeight(container, context) {
-	  var doc = _utilsDomUtils2['default'].ownerDocument(context);
-
-	  return container === doc.body || container === doc.documentElement ? doc.documentElement.clientHeight : container.clientHeight;
-	}
-
-	function getContainer(context) {
-	  return context.props.container && _react2['default'].findDOMNode(context.props.container) || _utilsDomUtils2['default'].ownerDocument(context).body;
-	}
-
-	var currentFocusListener = undefined;
-
-	/**
-	 * Firefox doesn't have a focusin event so using capture is easiest way to get bubbling
-	 * IE8 can't do addEventListener, but does have onfocusin, so we use that in ie8
-	 *
-	 * We only allow one Listener at a time to avoid stack overflows
-	 *
-	 * @param  {ReactElement|HTMLElement} context
-	 * @param  {Function} handler
-	 */
-	function onFocus(context, handler) {
-	  var doc = _utilsDomUtils2['default'].ownerDocument(context);
-	  var useFocusin = !doc.addEventListener;
-	  var remove = undefined;
-
-	  if (currentFocusListener) {
-	    currentFocusListener.remove();
-	  }
-
-	  if (useFocusin) {
-	    document.attachEvent('onfocusin', handler);
-	    remove = function () {
-	      return document.detachEvent('onfocusin', handler);
-	    };
-	  } else {
-	    document.addEventListener('focus', handler, true);
-	    remove = function () {
-	      return document.removeEventListener('focus', handler, true);
-	    };
-	  }
-
-	  currentFocusListener = { remove: remove };
-
-	  return currentFocusListener;
-	}
-
-	var Modal = _react2['default'].createClass({
-	  displayName: 'Modal',
-
-	  propTypes: _extends({}, _reactOverlaysLibPortal2['default'].propTypes, _ModalDialog2['default'].propTypes, {
-
-	    /**
-	     * Include a backdrop component. Specify 'static' for a backdrop that doesn't trigger an "onHide" when clicked.
-	     */
-	    backdrop: _react2['default'].PropTypes.oneOf(['static', true, false]),
-
-	    /**
-	     * Close the modal when escape key is pressed
-	     */
-	    keyboard: _react2['default'].PropTypes.bool,
-
-	    /**
-	     * Open and close the Modal with a slide and fade animation.
-	     */
-	    animation: _react2['default'].PropTypes.bool,
-
-	    /**
-	     * A Component type that provides the modal content Markup. This is a useful prop when you want to use your own
-	     * styles and markup to create a custom modal component.
-	     */
-	    dialogComponent: _utilsCustomPropTypes2['default'].elementType,
-
-	    /**
-	     * When `true` The modal will automatically shift focus to itself when it opens, and replace it to the last focused element when it closes.
-	     * Generally this should never be set to false as it makes the Modal less accessible to assistive technologies, like screen-readers.
-	     */
-	    autoFocus: _react2['default'].PropTypes.bool,
-
-	    /**
-	     * When `true` The modal will prevent focus from leaving the Modal while open.
-	     * Consider leaving the default value here, as it is necessary to make the Modal work well with assistive technologies,
-	     * such as screen readers.
-	     */
-	    enforceFocus: _react2['default'].PropTypes.bool,
-
-	    /**
-	     * Hide this from automatic props documentation generation.
-	     * @private
-	     */
-	    bsStyle: _react2['default'].PropTypes.string,
-
-	    /**
-	     * When `true` The modal will show itself.
-	     */
-	    show: _react2['default'].PropTypes.bool
-	  }),
-
-	  getDefaultProps: function getDefaultProps() {
-	    return {
-	      bsClass: 'modal',
-	      dialogComponent: _ModalDialog2['default'],
-	      show: false,
-	      animation: true,
-	      backdrop: true,
-	      keyboard: true,
-	      autoFocus: true,
-	      enforceFocus: true
-	    };
-	  },
-
-	  getInitialState: function getInitialState() {
-	    return {
-	      exited: !this.props.show
-	    };
-	  },
-
-	  render: function render() {
-	    var _props = this.props;
-	    var children = _props.children;
-	    var animation = _props.animation;
-	    var backdrop = _props.backdrop;
-
-	    var props = _objectWithoutProperties(_props, ['children', 'animation', 'backdrop']);
-
-	    var onExit = props.onExit;
-	    var onExiting = props.onExiting;
-	    var onEnter = props.onEnter;
-	    var onEntering = props.onEntering;
-	    var onEntered = props.onEntered;
-
-	    var show = !!props.show;
-	    var Dialog = props.dialogComponent;
-
-	    var mountModal = show || animation && !this.state.exited;
-	    if (!mountModal) {
-	      return null;
-	    }
-
-	    var modal = _react2['default'].createElement(
-	      Dialog,
-	      _extends({}, props, {
-	        ref: this._setDialogRef,
-	        className: _classnames2['default'](this.props.className, { 'in': show && !animation }),
-	        onClick: backdrop === true ? this.handleBackdropClick : null }),
-	      this.renderContent()
-	    );
-
-	    if (animation) {
-	      modal = _react2['default'].createElement(
-	        _Fade2['default'],
-	        {
-	          transitionAppear: true,
-	          unmountOnExit: true,
-	          'in': show,
-	          timeout: Modal.TRANSITION_DURATION,
-	          onExit: onExit,
-	          onExiting: onExiting,
-	          onExited: this.handleHidden,
-	          onEnter: onEnter,
-	          onEntering: onEntering,
-	          onEntered: onEntered },
-	        modal
-	      );
-	    }
-
-	    if (backdrop) {
-	      modal = this.renderBackdrop(modal);
-	    }
-
-	    return _react2['default'].createElement(
-	      _reactOverlaysLibPortal2['default'],
-	      { container: props.container },
-	      modal
-	    );
-	  },
-
-	  renderContent: function renderContent() {
-	    var _this = this;
-
-	    return _react2['default'].Children.map(this.props.children, function (child) {
-	      // TODO: use context in 0.14
-	      if (child && child.type && child.type.__isModalHeader) {
-	        return _react.cloneElement(child, {
-	          onHide: _utilsCreateChainedFunction2['default'](_this.props.onHide, child.props.onHide)
-	        });
-	      }
-	      return child;
-	    });
-	  },
-
-	  renderBackdrop: function renderBackdrop(modal) {
-	    var _props2 = this.props;
-	    var animation = _props2.animation;
-	    var bsClass = _props2.bsClass;
-
-	    var duration = Modal.BACKDROP_TRANSITION_DURATION;
-
-	    // Don't handle clicks for "static" backdrops
-	    var onClick = this.props.backdrop === true ? this.handleBackdropClick : null;
-
-	    var backdrop = _react2['default'].createElement('div', {
-	      ref: 'backdrop',
-	      className: _classnames2['default'](bsClass + '-backdrop', { 'in': this.props.show && !animation }),
-	      onClick: onClick });
-
-	    return _react2['default'].createElement(
-	      'div',
-	      {
-	        ref: 'modal' },
-	      animation ? _react2['default'].createElement(
-	        _Fade2['default'],
-	        { transitionAppear: true, 'in': this.props.show, timeout: duration },
-	        backdrop
-	      ) : backdrop,
-	      modal
-	    );
-	  },
-
-	  _setDialogRef: function _setDialogRef(ref) {
-	    // issue #1074
-	    // due to: https://github.com/facebook/react/blob/v0.13.3/src/core/ReactCompositeComponent.js#L842
-	    //
-	    // when backdrop is `false` react hasn't had a chance to reassign the refs to a usable object, b/c there are no other
-	    // "classic" refs on the component (or they haven't been processed yet)
-	    // TODO: Remove the need for this in next breaking release
-	    if (_Object$isFrozen(this.refs) && !_Object$keys(this.refs).length) {
-	      this.refs = {};
-	    }
-
-	    this.refs.dialog = ref;
-
-	    //maintains backwards compat with older component breakdown
-	    if (!this.props.backdrop) {
-	      this.refs.modal = ref;
-	    }
-	  },
-
-	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    if (nextProps.show) {
-	      this.setState({ exited: false });
-	    } else if (!nextProps.animation) {
-	      // Otherwise let handleHidden take care of marking exited.
-	      this.setState({ exited: true });
-	    }
-	  },
-
-	  componentWillUpdate: function componentWillUpdate(nextProps) {
-	    if (nextProps.show) {
-	      this.checkForFocus();
-	    }
-	  },
-
-	  componentDidMount: function componentDidMount() {
-	    if (this.props.show) {
-	      this.onShow();
-	    }
-	  },
-
-	  componentDidUpdate: function componentDidUpdate(prevProps) {
-	    var animation = this.props.animation;
-
-	    if (prevProps.show && !this.props.show && !animation) {
-	      //otherwise handleHidden will call this.
-	      this.onHide();
-	    } else if (!prevProps.show && this.props.show) {
-	      this.onShow();
-	    }
-	  },
-
-	  componentWillUnmount: function componentWillUnmount() {
-	    if (this.props.show) {
-	      this.onHide();
-	    }
-	  },
-
-	  onShow: function onShow() {
-	    var _this2 = this;
-
-	    var doc = _utilsDomUtils2['default'].ownerDocument(this);
-	    var win = _utilsDomUtils2['default'].ownerWindow(this);
-
-	    this._onDocumentKeyupListener = _utilsEventListener2['default'].listen(doc, 'keyup', this.handleDocumentKeyUp);
-
-	    this._onWindowResizeListener = _utilsEventListener2['default'].listen(win, 'resize', this.handleWindowResize);
-
-	    if (this.props.enforceFocus) {
-	      this._onFocusinListener = onFocus(this, this.enforceFocus);
-	    }
-
-	    var container = getContainer(this);
-
-	    container.className += container.className.length ? ' modal-open' : 'modal-open';
-
-	    this._containerIsOverflowing = container.scrollHeight > containerClientHeight(container, this);
-
-	    this._originalPadding = container.style.paddingRight;
-
-	    if (this._containerIsOverflowing) {
-	      container.style.paddingRight = parseInt(this._originalPadding || 0, 10) + _domHelpersUtilScrollbarSize2['default']() + 'px';
-	    }
-
-	    if (this.props.backdrop) {
-	      this.iosClickHack();
-	    }
-
-	    this.setState(this._getStyles(), function () {
-	      return _this2.focusModalContent();
-	    });
-	  },
-
-	  onHide: function onHide() {
-	    this._onDocumentKeyupListener.remove();
-	    this._onWindowResizeListener.remove();
-
-	    if (this._onFocusinListener) {
-	      this._onFocusinListener.remove();
-	    }
-
-	    var container = getContainer(this);
-
-	    container.style.paddingRight = this._originalPadding;
-
-	    container.className = container.className.replace(/ ?modal-open/, '');
-
-	    this.restoreLastFocus();
-	  },
-
-	  handleHidden: function handleHidden() {
-	    this.setState({ exited: true });
-
-	    this.onHide();
-
-	    if (this.props.onExited) {
-	      var _props3;
-
-	      (_props3 = this.props).onExited.apply(_props3, arguments);
-	    }
-	  },
-
-	  handleBackdropClick: function handleBackdropClick(e) {
-	    if (e.target !== e.currentTarget) {
-	      return;
-	    }
-
-	    this.props.onHide();
-	  },
-
-	  handleDocumentKeyUp: function handleDocumentKeyUp(e) {
-	    if (this.props.keyboard && e.keyCode === 27) {
-	      this.props.onHide();
-	    }
-	  },
-
-	  handleWindowResize: function handleWindowResize() {
-	    this.setState(this._getStyles());
-	  },
-
-	  checkForFocus: function checkForFocus() {
-	    if (_utilsDomUtils2['default'].canUseDom) {
-	      this.lastFocus = _utilsDomUtils2['default'].activeElement(document);
-	    }
-	  },
-
-	  focusModalContent: function focusModalContent() {
-	    var modalContent = _react2['default'].findDOMNode(this.refs.dialog);
-	    var current = _utilsDomUtils2['default'].activeElement(_utilsDomUtils2['default'].ownerDocument(this));
-	    var focusInModal = current && _utilsDomUtils2['default'].contains(modalContent, current);
-
-	    if (modalContent && this.props.autoFocus && !focusInModal) {
-	      this.lastFocus = current;
-	      modalContent.focus();
-	    }
-	  },
-
-	  restoreLastFocus: function restoreLastFocus() {
-	    if (this.lastFocus && this.lastFocus.focus) {
-	      this.lastFocus.focus();
-	      this.lastFocus = null;
-	    }
-	  },
-
-	  enforceFocus: function enforceFocus() {
-	    if (!this.isMounted()) {
-	      return;
-	    }
-
-	    var active = _utilsDomUtils2['default'].activeElement(_utilsDomUtils2['default'].ownerDocument(this));
-	    var modal = _react2['default'].findDOMNode(this.refs.dialog);
-
-	    if (modal && modal !== active && !_utilsDomUtils2['default'].contains(modal, active)) {
-	      modal.focus();
-	    }
-	  },
-
-	  iosClickHack: function iosClickHack() {
-	    // IOS only allows click events to be delegated to the document on elements
-	    // it considers 'clickable' - anchors, buttons, etc. We fake a click handler on the
-	    // DOM nodes themselves. Remove if handled by React: https://github.com/facebook/react/issues/1169
-	    _react2['default'].findDOMNode(this.refs.modal).onclick = function () {};
-	    _react2['default'].findDOMNode(this.refs.backdrop).onclick = function () {};
-	  },
-
-	  _getStyles: function _getStyles() {
-	    if (!_utilsDomUtils2['default'].canUseDom) {
-	      return {};
-	    }
-
-	    var node = _react2['default'].findDOMNode(this.refs.modal);
-	    var scrollHt = node.scrollHeight;
-	    var container = getContainer(this);
-	    var containerIsOverflowing = this._containerIsOverflowing;
-	    var modalIsOverflowing = scrollHt > containerClientHeight(container, this);
-
-	    return {
-	      dialogStyles: {
-	        paddingRight: containerIsOverflowing && !modalIsOverflowing ? _domHelpersUtilScrollbarSize2['default']() : void 0,
-	        paddingLeft: !containerIsOverflowing && modalIsOverflowing ? _domHelpersUtilScrollbarSize2['default']() : void 0
-	      }
-	    };
-	  }
-
-	});
-
-	Modal.Body = _ModalBody2['default'];
-	Modal.Header = _ModalHeader2['default'];
-	Modal.Title = _ModalTitle2['default'];
-	Modal.Footer = _ModalFooter2['default'];
-
-	Modal.Dialog = _ModalDialog2['default'];
-
-	Modal.TRANSITION_DURATION = 300;
-	Modal.BACKDROP_TRANSITION_DURATION = 150;
-
-	exports['default'] = Modal;
-	module.exports = exports['default'];
-
-/***/ },
-/* 287 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(288), __esModule: true };
-
-/***/ },
-/* 288 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(289);
-	module.exports = __webpack_require__(187).Object.isFrozen;
-
-/***/ },
-/* 289 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// 19.1.2.12 Object.isFrozen(O)
-	var isObject = __webpack_require__(217);
-
-	__webpack_require__(204)('isFrozen', function($isFrozen){
-	  return function isFrozen(it){
-	    return isObject(it) ? $isFrozen ? $isFrozen(it) : false : true;
-	  };
-	});
-
-/***/ },
-/* 290 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _interopRequireDefault = __webpack_require__(196)['default'];
-
-	exports.__esModule = true;
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _domHelpersUtilInDOM = __webpack_require__(235);
-
-	var _domHelpersUtilInDOM2 = _interopRequireDefault(_domHelpersUtilInDOM);
-
-	var _domHelpersOwnerDocument = __webpack_require__(229);
-
-	var _domHelpersOwnerDocument2 = _interopRequireDefault(_domHelpersOwnerDocument);
-
-	var _domHelpersOwnerWindow = __webpack_require__(291);
-
-	var _domHelpersOwnerWindow2 = _interopRequireDefault(_domHelpersOwnerWindow);
-
-	var _domHelpersQueryContains = __webpack_require__(234);
-
-	var _domHelpersQueryContains2 = _interopRequireDefault(_domHelpersQueryContains);
-
-	var _domHelpersActiveElement = __webpack_require__(292);
-
-	var _domHelpersActiveElement2 = _interopRequireDefault(_domHelpersActiveElement);
-
-	var _domHelpersQueryOffset = __webpack_require__(233);
-
-	var _domHelpersQueryOffset2 = _interopRequireDefault(_domHelpersQueryOffset);
-
-	var _domHelpersQueryOffsetParent = __webpack_require__(239);
-
-	var _domHelpersQueryOffsetParent2 = _interopRequireDefault(_domHelpersQueryOffsetParent);
-
-	var _domHelpersQueryPosition = __webpack_require__(237);
-
-	var _domHelpersQueryPosition2 = _interopRequireDefault(_domHelpersQueryPosition);
-
-	var _domHelpersStyle = __webpack_require__(240);
-
-	var _domHelpersStyle2 = _interopRequireDefault(_domHelpersStyle);
-
-	function ownerDocument(componentOrElement) {
-	  var elem = _react2['default'].findDOMNode(componentOrElement);
-	  return _domHelpersOwnerDocument2['default'](elem && elem.ownerDocument || document);
-	}
-
-	function ownerWindow(componentOrElement) {
-	  var doc = ownerDocument(componentOrElement);
-	  return _domHelpersOwnerWindow2['default'](doc);
-	}
-
-	//TODO remove in 0.26
-	function getComputedStyles(elem) {
-	  return ownerDocument(elem).defaultView.getComputedStyle(elem, null);
-	}
-
-	/**
-	 * Get the height of the document
-	 *
-	 * @returns {documentHeight: number}
-	 */
-	function getDocumentHeight() {
-	  return Math.max(document.documentElement.offsetHeight, document.height, document.body.scrollHeight, document.body.offsetHeight);
-	}
-
-	/**
-	 * Get an element's size
-	 *
-	 * @param {HTMLElement} elem
-	 * @returns {{width: number, height: number}}
-	 */
-	function getSize(elem) {
-	  var rect = {
-	    width: elem.offsetWidth || 0,
-	    height: elem.offsetHeight || 0
-	  };
-	  if (typeof elem.getBoundingClientRect !== 'undefined') {
-	    var _elem$getBoundingClientRect = elem.getBoundingClientRect();
-
-	    var width = _elem$getBoundingClientRect.width;
-	    var height = _elem$getBoundingClientRect.height;
-
-	    rect.width = width || rect.width;
-	    rect.height = height || rect.height;
-	  }
-	  return rect;
-	}
-
-	exports['default'] = {
-	  canUseDom: _domHelpersUtilInDOM2['default'],
-	  css: _domHelpersStyle2['default'],
-	  getComputedStyles: getComputedStyles,
-	  contains: _domHelpersQueryContains2['default'],
-	  ownerWindow: ownerWindow,
-	  ownerDocument: ownerDocument,
-	  getOffset: _domHelpersQueryOffset2['default'],
-	  getDocumentHeight: getDocumentHeight,
-	  getPosition: _domHelpersQueryPosition2['default'],
-	  getSize: getSize,
-	  activeElement: _domHelpersActiveElement2['default'],
-	  offsetParent: _domHelpersQueryOffsetParent2['default']
-	};
-	module.exports = exports['default'];
-
-/***/ },
-/* 291 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var babelHelpers = __webpack_require__(238);
-
-	exports.__esModule = true;
-	exports['default'] = ownerWindow;
-
-	var _ownerDocument = __webpack_require__(229);
-
-	var _ownerDocument2 = babelHelpers.interopRequireDefault(_ownerDocument);
-
-	function ownerWindow(node) {
-	  var doc = (0, _ownerDocument2['default'])(node);
-	  return doc && doc.defaultView || doc.parentWindow;
-	}
-
-	module.exports = exports['default'];
-
-/***/ },
-/* 292 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var babelHelpers = __webpack_require__(238);
-
-	exports.__esModule = true;
-
-	/**
-	 * document.activeElement
-	 */
-	exports['default'] = activeElement;
-
-	var _ownerDocument = __webpack_require__(229);
-
-	var _ownerDocument2 = babelHelpers.interopRequireDefault(_ownerDocument);
-
-	function activeElement() {
-	  var doc = arguments[0] === undefined ? document : arguments[0];
-
-	  try {
-	    return doc.activeElement;
-	  } catch (e) {}
-	}
-
-	module.exports = exports['default'];
-
-/***/ },
-/* 293 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var canUseDOM = __webpack_require__(235);
-
-	var size;
-
-	module.exports = function (recalc) {
-	  if (!size || recalc) {
-	    if (canUseDOM) {
-	      var scrollDiv = document.createElement('div');
-
-	      scrollDiv.style.position = 'absolute';
-	      scrollDiv.style.top = '-9999px';
-	      scrollDiv.style.width = '50px';
-	      scrollDiv.style.height = '50px';
-	      scrollDiv.style.overflow = 'scroll';
-
-	      document.body.appendChild(scrollDiv);
-	      size = scrollDiv.offsetWidth - scrollDiv.clientWidth;
-	      document.body.removeChild(scrollDiv);
-	    }
-	  }
-
-	  return size;
-	};
-
-/***/ },
-/* 294 */
-/***/ function(module, exports) {
-
-	/**
-	 * Copyright 2013-2014 Facebook, Inc.
-	 *
-	 * This file contains a modified version of:
-	 * https://github.com/facebook/react/blob/v0.12.0/src/vendor/stubs/EventListener.js
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 * http://www.apache.org/licenses/LICENSE-2.0
-	 *
-	 * Unless required by applicable law or agreed to in writing, software
-	 * distributed under the License is distributed on an "AS IS" BASIS,
-	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	 * See the License for the specific language governing permissions and
-	 * limitations under the License.
-	 *
-	 * TODO: remove in favour of solution provided by:
-	 *  https://github.com/facebook/react/issues/285
-	 */
-
-	/**
-	 * Does not take into account specific nature of platform.
-	 */
-	'use strict';
-
-	exports.__esModule = true;
-	var EventListener = {
-	  /**
-	   * Listen to DOM events during the bubble phase.
-	   *
-	   * @param {DOMEventTarget} target DOM element to register listener on.
-	   * @param {string} eventType Event type, e.g. 'click' or 'mouseover'.
-	   * @param {function} callback Callback function.
-	   * @return {object} Object with a `remove` method.
-	   */
-	  listen: function listen(target, eventType, callback) {
-	    if (target.addEventListener) {
-	      target.addEventListener(eventType, callback, false);
-	      return {
-	        remove: function remove() {
-	          target.removeEventListener(eventType, callback, false);
-	        }
-	      };
-	    } else if (target.attachEvent) {
-	      target.attachEvent('on' + eventType, callback);
-	      return {
-	        remove: function remove() {
-	          target.detachEvent('on' + eventType, callback);
-	        }
-	      };
-	    }
-	  }
-	};
-
-	exports['default'] = EventListener;
-	module.exports = exports['default'];
-
-/***/ },
-/* 295 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*eslint-disable react/prop-types */
-	'use strict';
-
-	var _extends = __webpack_require__(181)['default'];
-
-	var _interopRequireDefault = __webpack_require__(196)['default'];
-
-	exports.__esModule = true;
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _classnames = __webpack_require__(197);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _BootstrapMixin = __webpack_require__(198);
-
-	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
-
-	var ModalDialog = _react2['default'].createClass({
-	  displayName: 'ModalDialog',
-
-	  mixins: [_BootstrapMixin2['default']],
-
-	  propTypes: {
-	    /**
-	     * A Callback fired when the header closeButton or non-static backdrop is clicked.
-	     * @type {function}
-	     * @required
-	     */
-	    onHide: _react2['default'].PropTypes.func.isRequired,
-
-	    /**
-	     * A css class to apply to the Modal dialog DOM node.
-	     */
-	    dialogClassName: _react2['default'].PropTypes.string
-
-	  },
-
-	  getDefaultProps: function getDefaultProps() {
-	    return {
-	      bsClass: 'modal',
-	      closeButton: true
-	    };
-	  },
-
-	  render: function render() {
-	    var modalStyle = _extends({
-	      display: 'block'
-	    }, this.props.style);
-	    var bsClass = this.props.bsClass;
-	    var dialogClasses = this.getBsClassSet();
-
-	    delete dialogClasses.modal;
-	    dialogClasses[bsClass + '-dialog'] = true;
-
-	    return _react2['default'].createElement(
-	      'div',
-	      _extends({}, this.props, {
-	        title: null,
-	        tabIndex: '-1',
-	        role: 'dialog',
-	        style: modalStyle,
-	        className: _classnames2['default'](this.props.className, bsClass) }),
-	      _react2['default'].createElement(
-	        'div',
-	        { className: _classnames2['default'](this.props.dialogClassName, dialogClasses) },
-	        _react2['default'].createElement(
-	          'div',
-	          { className: bsClass + '-content', role: 'document' },
-	          this.props.children
-	        )
-	      )
-	    );
-	  }
-	});
-
-	exports['default'] = ModalDialog;
-	module.exports = exports['default'];
-
-/***/ },
-/* 296 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _inherits = __webpack_require__(210)['default'];
-
-	var _classCallCheck = __webpack_require__(221)['default'];
-
-	var _extends = __webpack_require__(181)['default'];
-
-	var _interopRequireDefault = __webpack_require__(196)['default'];
-
-	exports.__esModule = true;
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _classnames = __webpack_require__(197);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var ModalBody = (function (_React$Component) {
-	  _inherits(ModalBody, _React$Component);
-
-	  function ModalBody() {
-	    _classCallCheck(this, ModalBody);
-
-	    _React$Component.apply(this, arguments);
-	  }
-
-	  ModalBody.prototype.render = function render() {
-	    return _react2['default'].createElement(
-	      'div',
-	      _extends({}, this.props, {
-	        className: _classnames2['default'](this.props.className, this.props.modalClassName) }),
-	      this.props.children
-	    );
-	  };
-
-	  return ModalBody;
-	})(_react2['default'].Component);
-
-	ModalBody.propTypes = {
-	  /**
-	   * A css class applied to the Component
-	   */
-	  modalClassName: _react2['default'].PropTypes.string
-	};
-
-	ModalBody.defaultProps = {
-	  modalClassName: 'modal-body'
-	};
-
-	exports['default'] = ModalBody;
-	module.exports = exports['default'];
-
-/***/ },
-/* 297 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _inherits = __webpack_require__(210)['default'];
-
-	var _classCallCheck = __webpack_require__(221)['default'];
-
-	var _extends = __webpack_require__(181)['default'];
-
-	var _interopRequireDefault = __webpack_require__(196)['default'];
-
-	exports.__esModule = true;
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _classnames = __webpack_require__(197);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var ModalHeader = (function (_React$Component) {
-	  _inherits(ModalHeader, _React$Component);
-
-	  function ModalHeader() {
-	    _classCallCheck(this, ModalHeader);
-
-	    _React$Component.apply(this, arguments);
-	  }
-
-	  //used in liue of parent contexts right now to auto wire the close button
-
-	  ModalHeader.prototype.render = function render() {
-	    return _react2['default'].createElement(
-	      'div',
-	      _extends({}, this.props, {
-	        className: _classnames2['default'](this.props.className, this.props.modalClassName) }),
-	      this.props.closeButton && _react2['default'].createElement(
-	        'button',
-	        {
-	          className: 'close',
-	          onClick: this.props.onHide },
-	        _react2['default'].createElement(
-	          'span',
-	          { 'aria-hidden': 'true' },
-	          '×'
-	        )
-	      ),
-	      this.props.children
-	    );
-	  };
-
-	  return ModalHeader;
-	})(_react2['default'].Component);
-
-	ModalHeader.__isModalHeader = true;
-
-	ModalHeader.propTypes = {
-	  /**
-	   * The 'aria-label' attribute is used to define a string that labels the current element.
-	   * It is used for Assistive Technology when the label text is not visible on screen.
-	   */
-	  'aria-label': _react2['default'].PropTypes.string,
-
-	  /**
-	   * A css class applied to the Component
-	   */
-	  modalClassName: _react2['default'].PropTypes.string,
-
-	  /**
-	   * Specify whether the Component should contain a close button
-	   */
-	  closeButton: _react2['default'].PropTypes.bool,
-
-	  /**
-	   * A Callback fired when the close button is clicked. If used directly inside a Modal component, the onHide will automatically
-	   * be propagated up to the parent Modal `onHide`.
-	   */
-	  onHide: _react2['default'].PropTypes.func
-	};
-
-	ModalHeader.defaultProps = {
-	  'aria-label': 'Close',
-	  modalClassName: 'modal-header',
-	  closeButton: false
-	};
-
-	exports['default'] = ModalHeader;
-	module.exports = exports['default'];
-
-/***/ },
-/* 298 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _inherits = __webpack_require__(210)['default'];
-
-	var _classCallCheck = __webpack_require__(221)['default'];
-
-	var _extends = __webpack_require__(181)['default'];
-
-	var _interopRequireDefault = __webpack_require__(196)['default'];
-
-	exports.__esModule = true;
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _classnames = __webpack_require__(197);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var ModalTitle = (function (_React$Component) {
-	  _inherits(ModalTitle, _React$Component);
-
-	  function ModalTitle() {
-	    _classCallCheck(this, ModalTitle);
-
-	    _React$Component.apply(this, arguments);
-	  }
-
-	  ModalTitle.prototype.render = function render() {
-	    return _react2['default'].createElement(
-	      'h4',
-	      _extends({}, this.props, {
-	        className: _classnames2['default'](this.props.className, this.props.modalClassName) }),
-	      this.props.children
-	    );
-	  };
-
-	  return ModalTitle;
-	})(_react2['default'].Component);
-
-	ModalTitle.propTypes = {
-	  /**
-	   * A css class applied to the Component
-	   */
-	  modalClassName: _react2['default'].PropTypes.string
-	};
-
-	ModalTitle.defaultProps = {
-	  modalClassName: 'modal-title'
-	};
-
-	exports['default'] = ModalTitle;
-	module.exports = exports['default'];
-
-/***/ },
-/* 299 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _inherits = __webpack_require__(210)['default'];
-
-	var _classCallCheck = __webpack_require__(221)['default'];
-
-	var _extends = __webpack_require__(181)['default'];
-
-	var _interopRequireDefault = __webpack_require__(196)['default'];
-
-	exports.__esModule = true;
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _classnames = __webpack_require__(197);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var ModalFooter = (function (_React$Component) {
-	  _inherits(ModalFooter, _React$Component);
-
-	  function ModalFooter() {
-	    _classCallCheck(this, ModalFooter);
-
-	    _React$Component.apply(this, arguments);
-	  }
-
-	  ModalFooter.prototype.render = function render() {
-	    return _react2['default'].createElement(
-	      'div',
-	      _extends({}, this.props, {
-	        className: _classnames2['default'](this.props.className, this.props.modalClassName) }),
-	      this.props.children
-	    );
-	  };
-
-	  return ModalFooter;
-	})(_react2['default'].Component);
-
-	ModalFooter.propTypes = {
-	  /**
-	   * A css class applied to the Component
-	   */
-	  modalClassName: _react2['default'].PropTypes.string
-	};
-
-	ModalFooter.defaultProps = {
-	  modalClassName: 'modal-footer'
-	};
-
-	exports['default'] = ModalFooter;
-	module.exports = exports['default'];
-
-/***/ },
-/* 300 */
+/* 285 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28255,7 +27093,7 @@ webpackJsonp([0,1],[
 
 	var _utilsCustomPropTypes2 = _interopRequireDefault(_utilsCustomPropTypes);
 
-	var _ButtonInput = __webpack_require__(301);
+	var _ButtonInput = __webpack_require__(286);
 
 	var _ButtonInput2 = _interopRequireDefault(_ButtonInput);
 
@@ -28359,7 +27197,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 301 */
+/* 286 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28380,19 +27218,19 @@ webpackJsonp([0,1],[
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Button = __webpack_require__(300);
+	var _Button = __webpack_require__(285);
 
 	var _Button2 = _interopRequireDefault(_Button);
 
-	var _FormGroup = __webpack_require__(302);
+	var _FormGroup = __webpack_require__(287);
 
 	var _FormGroup2 = _interopRequireDefault(_FormGroup);
 
-	var _InputBase2 = __webpack_require__(303);
+	var _InputBase2 = __webpack_require__(288);
 
 	var _InputBase3 = _interopRequireDefault(_InputBase2);
 
-	var _utilsChildrenValueInputValidation = __webpack_require__(305);
+	var _utilsChildrenValueInputValidation = __webpack_require__(290);
 
 	var _utilsChildrenValueInputValidation2 = _interopRequireDefault(_utilsChildrenValueInputValidation);
 
@@ -28453,7 +27291,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 302 */
+/* 287 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28527,7 +27365,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 303 */
+/* 288 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28550,11 +27388,11 @@ webpackJsonp([0,1],[
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _FormGroup = __webpack_require__(302);
+	var _FormGroup = __webpack_require__(287);
 
 	var _FormGroup2 = _interopRequireDefault(_FormGroup);
 
-	var _Glyphicon = __webpack_require__(304);
+	var _Glyphicon = __webpack_require__(289);
 
 	var _Glyphicon2 = _interopRequireDefault(_Glyphicon);
 
@@ -28796,7 +27634,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 304 */
+/* 289 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28859,7 +27697,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 305 */
+/* 290 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28890,7 +27728,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 306 */
+/* 291 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28901,7 +27739,7 @@ webpackJsonp([0,1],[
 
 	var _interopRequireDefault = __webpack_require__(196)['default'];
 
-	var _interopRequireWildcard = __webpack_require__(307)['default'];
+	var _interopRequireWildcard = __webpack_require__(292)['default'];
 
 	exports.__esModule = true;
 
@@ -28909,11 +27747,11 @@ webpackJsonp([0,1],[
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _InputBase2 = __webpack_require__(303);
+	var _InputBase2 = __webpack_require__(288);
 
 	var _InputBase3 = _interopRequireDefault(_InputBase2);
 
-	var _FormControls = __webpack_require__(308);
+	var _FormControls = __webpack_require__(293);
 
 	var FormControls = _interopRequireWildcard(_FormControls);
 
@@ -28950,7 +27788,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 307 */
+/* 292 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -28975,7 +27813,7 @@ webpackJsonp([0,1],[
 	exports.__esModule = true;
 
 /***/ },
-/* 308 */
+/* 293 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28984,14 +27822,14 @@ webpackJsonp([0,1],[
 
 	exports.__esModule = true;
 
-	var _Static2 = __webpack_require__(309);
+	var _Static2 = __webpack_require__(294);
 
 	var _Static3 = _interopRequireDefault(_Static2);
 
 	exports.Static = _Static3['default'];
 
 /***/ },
-/* 309 */
+/* 294 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29014,11 +27852,11 @@ webpackJsonp([0,1],[
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _InputBase2 = __webpack_require__(303);
+	var _InputBase2 = __webpack_require__(288);
 
 	var _InputBase3 = _interopRequireDefault(_InputBase2);
 
-	var _utilsChildrenValueInputValidation = __webpack_require__(305);
+	var _utilsChildrenValueInputValidation = __webpack_require__(290);
 
 	var _utilsChildrenValueInputValidation2 = _interopRequireDefault(_utilsChildrenValueInputValidation);
 
@@ -29059,7 +27897,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 310 */
+/* 295 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29276,7 +28114,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 311 */
+/* 296 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29295,7 +28133,7 @@ webpackJsonp([0,1],[
 
 	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-	var _Collapse = __webpack_require__(312);
+	var _Collapse = __webpack_require__(297);
 
 	var _Collapse2 = _interopRequireDefault(_Collapse);
 
@@ -29434,7 +28272,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 312 */
+/* 297 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29457,7 +28295,7 @@ webpackJsonp([0,1],[
 
 	var _reactOverlaysLibTransition2 = _interopRequireDefault(_reactOverlaysLibTransition);
 
-	var _utilsDomUtils = __webpack_require__(290);
+	var _utilsDomUtils = __webpack_require__(298);
 
 	var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
@@ -29690,7 +28528,171 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 313 */
+/* 298 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _interopRequireDefault = __webpack_require__(196)['default'];
+
+	exports.__esModule = true;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _domHelpersUtilInDOM = __webpack_require__(235);
+
+	var _domHelpersUtilInDOM2 = _interopRequireDefault(_domHelpersUtilInDOM);
+
+	var _domHelpersOwnerDocument = __webpack_require__(229);
+
+	var _domHelpersOwnerDocument2 = _interopRequireDefault(_domHelpersOwnerDocument);
+
+	var _domHelpersOwnerWindow = __webpack_require__(299);
+
+	var _domHelpersOwnerWindow2 = _interopRequireDefault(_domHelpersOwnerWindow);
+
+	var _domHelpersQueryContains = __webpack_require__(234);
+
+	var _domHelpersQueryContains2 = _interopRequireDefault(_domHelpersQueryContains);
+
+	var _domHelpersActiveElement = __webpack_require__(300);
+
+	var _domHelpersActiveElement2 = _interopRequireDefault(_domHelpersActiveElement);
+
+	var _domHelpersQueryOffset = __webpack_require__(233);
+
+	var _domHelpersQueryOffset2 = _interopRequireDefault(_domHelpersQueryOffset);
+
+	var _domHelpersQueryOffsetParent = __webpack_require__(239);
+
+	var _domHelpersQueryOffsetParent2 = _interopRequireDefault(_domHelpersQueryOffsetParent);
+
+	var _domHelpersQueryPosition = __webpack_require__(237);
+
+	var _domHelpersQueryPosition2 = _interopRequireDefault(_domHelpersQueryPosition);
+
+	var _domHelpersStyle = __webpack_require__(240);
+
+	var _domHelpersStyle2 = _interopRequireDefault(_domHelpersStyle);
+
+	function ownerDocument(componentOrElement) {
+	  var elem = _react2['default'].findDOMNode(componentOrElement);
+	  return _domHelpersOwnerDocument2['default'](elem && elem.ownerDocument || document);
+	}
+
+	function ownerWindow(componentOrElement) {
+	  var doc = ownerDocument(componentOrElement);
+	  return _domHelpersOwnerWindow2['default'](doc);
+	}
+
+	//TODO remove in 0.26
+	function getComputedStyles(elem) {
+	  return ownerDocument(elem).defaultView.getComputedStyle(elem, null);
+	}
+
+	/**
+	 * Get the height of the document
+	 *
+	 * @returns {documentHeight: number}
+	 */
+	function getDocumentHeight() {
+	  return Math.max(document.documentElement.offsetHeight, document.height, document.body.scrollHeight, document.body.offsetHeight);
+	}
+
+	/**
+	 * Get an element's size
+	 *
+	 * @param {HTMLElement} elem
+	 * @returns {{width: number, height: number}}
+	 */
+	function getSize(elem) {
+	  var rect = {
+	    width: elem.offsetWidth || 0,
+	    height: elem.offsetHeight || 0
+	  };
+	  if (typeof elem.getBoundingClientRect !== 'undefined') {
+	    var _elem$getBoundingClientRect = elem.getBoundingClientRect();
+
+	    var width = _elem$getBoundingClientRect.width;
+	    var height = _elem$getBoundingClientRect.height;
+
+	    rect.width = width || rect.width;
+	    rect.height = height || rect.height;
+	  }
+	  return rect;
+	}
+
+	exports['default'] = {
+	  canUseDom: _domHelpersUtilInDOM2['default'],
+	  css: _domHelpersStyle2['default'],
+	  getComputedStyles: getComputedStyles,
+	  contains: _domHelpersQueryContains2['default'],
+	  ownerWindow: ownerWindow,
+	  ownerDocument: ownerDocument,
+	  getOffset: _domHelpersQueryOffset2['default'],
+	  getDocumentHeight: getDocumentHeight,
+	  getPosition: _domHelpersQueryPosition2['default'],
+	  getSize: getSize,
+	  activeElement: _domHelpersActiveElement2['default'],
+	  offsetParent: _domHelpersQueryOffsetParent2['default']
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 299 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var babelHelpers = __webpack_require__(238);
+
+	exports.__esModule = true;
+	exports['default'] = ownerWindow;
+
+	var _ownerDocument = __webpack_require__(229);
+
+	var _ownerDocument2 = babelHelpers.interopRequireDefault(_ownerDocument);
+
+	function ownerWindow(node) {
+	  var doc = (0, _ownerDocument2['default'])(node);
+	  return doc && doc.defaultView || doc.parentWindow;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 300 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var babelHelpers = __webpack_require__(238);
+
+	exports.__esModule = true;
+
+	/**
+	 * document.activeElement
+	 */
+	exports['default'] = activeElement;
+
+	var _ownerDocument = __webpack_require__(229);
+
+	var _ownerDocument2 = babelHelpers.interopRequireDefault(_ownerDocument);
+
+	function activeElement() {
+	  var doc = arguments[0] === undefined ? document : arguments[0];
+
+	  try {
+	    return doc.activeElement;
+	  } catch (e) {}
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 301 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29715,7 +28717,7 @@ webpackJsonp([0,1],[
 
 	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-	var _SafeAnchor = __webpack_require__(314);
+	var _SafeAnchor = __webpack_require__(302);
 
 	var _SafeAnchor2 = _interopRequireDefault(_SafeAnchor);
 
@@ -29801,7 +28803,7 @@ webpackJsonp([0,1],[
 	module.exports = exports['default'];
 
 /***/ },
-/* 314 */
+/* 302 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29863,259 +28865,6 @@ webpackJsonp([0,1],[
 	  href: _react2['default'].PropTypes.string,
 	  onClick: _react2['default'].PropTypes.func
 	};
-	module.exports = exports['default'];
-
-/***/ },
-/* 315 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _objectWithoutProperties = __webpack_require__(222)['default'];
-
-	var _extends = __webpack_require__(181)['default'];
-
-	var _interopRequireDefault = __webpack_require__(196)['default'];
-
-	exports.__esModule = true;
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _classnames = __webpack_require__(197);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _BootstrapMixin = __webpack_require__(198);
-
-	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
-
-	var _Collapse = __webpack_require__(312);
-
-	var _Collapse2 = _interopRequireDefault(_Collapse);
-
-	var Panel = _react2['default'].createClass({
-	  displayName: 'Panel',
-
-	  mixins: [_BootstrapMixin2['default']],
-
-	  propTypes: {
-	    collapsible: _react2['default'].PropTypes.bool,
-	    onSelect: _react2['default'].PropTypes.func,
-	    header: _react2['default'].PropTypes.node,
-	    id: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]),
-	    footer: _react2['default'].PropTypes.node,
-	    defaultExpanded: _react2['default'].PropTypes.bool,
-	    expanded: _react2['default'].PropTypes.bool,
-	    eventKey: _react2['default'].PropTypes.any,
-	    headerRole: _react2['default'].PropTypes.string,
-	    panelRole: _react2['default'].PropTypes.string
-	  },
-
-	  getDefaultProps: function getDefaultProps() {
-	    return {
-	      bsClass: 'panel',
-	      bsStyle: 'default',
-	      defaultExpanded: false
-	    };
-	  },
-
-	  getInitialState: function getInitialState() {
-	    return {
-	      expanded: this.props.defaultExpanded
-	    };
-	  },
-
-	  handleSelect: function handleSelect(e) {
-	    e.selected = true;
-
-	    if (this.props.onSelect) {
-	      this.props.onSelect(e, this.props.eventKey);
-	    } else {
-	      e.preventDefault();
-	    }
-
-	    if (e.selected) {
-	      this.handleToggle();
-	    }
-	  },
-
-	  handleToggle: function handleToggle() {
-	    this.setState({ expanded: !this.state.expanded });
-	  },
-
-	  isExpanded: function isExpanded() {
-	    return this.props.expanded != null ? this.props.expanded : this.state.expanded;
-	  },
-
-	  render: function render() {
-	    var _props = this.props;
-	    var headerRole = _props.headerRole;
-	    var panelRole = _props.panelRole;
-
-	    var props = _objectWithoutProperties(_props, ['headerRole', 'panelRole']);
-
-	    return _react2['default'].createElement(
-	      'div',
-	      _extends({}, props, {
-	        className: _classnames2['default'](this.props.className, this.getBsClassSet()),
-	        id: this.props.collapsible ? null : this.props.id, onSelect: null }),
-	      this.renderHeading(headerRole),
-	      this.props.collapsible ? this.renderCollapsibleBody(panelRole) : this.renderBody(),
-	      this.renderFooter()
-	    );
-	  },
-
-	  renderCollapsibleBody: function renderCollapsibleBody(panelRole) {
-	    var props = {
-	      className: this.prefixClass('collapse'),
-	      id: this.props.id,
-	      ref: 'panel',
-	      'aria-hidden': !this.isExpanded()
-	    };
-	    if (panelRole) {
-	      props.role = panelRole;
-	    }
-
-	    return _react2['default'].createElement(
-	      _Collapse2['default'],
-	      { 'in': this.isExpanded() },
-	      _react2['default'].createElement(
-	        'div',
-	        props,
-	        this.renderBody()
-	      )
-	    );
-	  },
-
-	  renderBody: function renderBody() {
-	    var allChildren = this.props.children;
-	    var bodyElements = [];
-	    var panelBodyChildren = [];
-	    var bodyClass = this.prefixClass('body');
-
-	    function getProps() {
-	      return { key: bodyElements.length };
-	    }
-
-	    function addPanelChild(child) {
-	      bodyElements.push(_react.cloneElement(child, getProps()));
-	    }
-
-	    function addPanelBody(children) {
-	      bodyElements.push(_react2['default'].createElement(
-	        'div',
-	        _extends({ className: bodyClass }, getProps()),
-	        children
-	      ));
-	    }
-
-	    function maybeRenderPanelBody() {
-	      if (panelBodyChildren.length === 0) {
-	        return;
-	      }
-
-	      addPanelBody(panelBodyChildren);
-	      panelBodyChildren = [];
-	    }
-
-	    // Handle edge cases where we should not iterate through children.
-	    if (!Array.isArray(allChildren) || allChildren.length === 0) {
-	      if (this.shouldRenderFill(allChildren)) {
-	        addPanelChild(allChildren);
-	      } else {
-	        addPanelBody(allChildren);
-	      }
-	    } else {
-
-	      allChildren.forEach((function (child) {
-	        if (this.shouldRenderFill(child)) {
-	          maybeRenderPanelBody();
-
-	          // Separately add the filled element.
-	          addPanelChild(child);
-	        } else {
-	          panelBodyChildren.push(child);
-	        }
-	      }).bind(this));
-
-	      maybeRenderPanelBody();
-	    }
-
-	    return bodyElements;
-	  },
-
-	  shouldRenderFill: function shouldRenderFill(child) {
-	    return _react2['default'].isValidElement(child) && child.props.fill != null;
-	  },
-
-	  renderHeading: function renderHeading(headerRole) {
-	    var header = this.props.header;
-
-	    if (!header) {
-	      return null;
-	    }
-
-	    if (!_react2['default'].isValidElement(header) || Array.isArray(header)) {
-	      header = this.props.collapsible ? this.renderCollapsibleTitle(header, headerRole) : header;
-	    } else {
-	      var className = _classnames2['default'](this.prefixClass('title'), header.props.className);
-
-	      if (this.props.collapsible) {
-	        header = _react.cloneElement(header, {
-	          className: className,
-	          children: this.renderAnchor(header.props.children, headerRole)
-	        });
-	      } else {
-	        header = _react.cloneElement(header, { className: className });
-	      }
-	    }
-
-	    return _react2['default'].createElement(
-	      'div',
-	      { className: this.prefixClass('heading') },
-	      header
-	    );
-	  },
-
-	  renderAnchor: function renderAnchor(header, headerRole) {
-	    return _react2['default'].createElement(
-	      'a',
-	      {
-	        href: '#' + (this.props.id || ''),
-	        'aria-controls': this.props.collapsible ? this.props.id : null,
-	        className: this.isExpanded() ? null : 'collapsed',
-	        'aria-expanded': this.isExpanded(),
-	        'aria-selected': this.isExpanded(),
-	        onClick: this.handleSelect,
-	        role: headerRole },
-	      header
-	    );
-	  },
-
-	  renderCollapsibleTitle: function renderCollapsibleTitle(header, headerRole) {
-	    return _react2['default'].createElement(
-	      'h4',
-	      { className: this.prefixClass('title'), role: 'presentation' },
-	      this.renderAnchor(header, headerRole)
-	    );
-	  },
-
-	  renderFooter: function renderFooter() {
-	    if (!this.props.footer) {
-	      return null;
-	    }
-
-	    return _react2['default'].createElement(
-	      'div',
-	      { className: this.prefixClass('footer') },
-	      this.props.footer
-	    );
-	  }
-	});
-
-	exports['default'] = Panel;
 	module.exports = exports['default'];
 
 /***/ }

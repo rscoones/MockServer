@@ -16,8 +16,9 @@
     "body-parser": "^1.13.3",
     "cors": "^2.7.1",
     "express": "^4.13.1",
+    "express-session": "^1.13.0",
     "q": "^1.4.1",
-    "qs": "^5.0.0"
+    "rs-filewalk": "^1.0.1"
   },
   "author": "Richard Scoones",
   "license": "MIT"

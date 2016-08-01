@@ -1,15 +1,17 @@
-var xhr = require('xhr');
-var qs = require('qs');
-var AppDispatcher = require('AppDispatcher');
-var Constants = require('MockServerUI/constants/Constants');
+const xhr = require('xhr');
+const qs = require('qs');
+const AppDispatcher = require('AppDispatcher');
+const Constants = require('MockServerUI/constants/Constants');
 
 module.exports = {
   load() {
-    xhr({
+    const options = {
       method: "GET",
       uri: "api"
-    }, function (err, resp, body) {
-      let data = JSON.parse(resp.body);
+    };
+
+    xhr(options, (err, resp, body) => {
+      const data = JSON.parse(resp.body);
       AppDispatcher.handleViewAction({
         type: Constants.ActionTypes.ADD_URLS,
         urls: data.urls,
@@ -17,14 +19,17 @@ module.exports = {
       });
     });
   },
+
   select(url) {
     if (url) {
       let query = qs.stringify({url: url.url});
-      xhr({
+      const options = {
         method: "GET",
         uri: "api?" + query
-      }, function (err, resp, body) {
-        let data = JSON.parse(resp.body);
+      };
+
+      xhr(options, (err, resp, body) => {
+        const data = JSON.parse(resp.body);
         _setSelected(data, url);
       });
     } else {
@@ -33,23 +38,31 @@ module.exports = {
   },
   save(selected, obj, method) {
     console.log(selected, obj);
-    var data = {url: selected.url.url, method: method, data: JSON.stringify(obj)};
-    xhr({
+    const data = {
+      url: selected.url.url,
+      method: method,
+      data: JSON.stringify(obj)
+    };
+
+    const options = {
       method: "POST",
       uri: "api",
       json: data
-    }, function (err, resp, body) {
+    };
+
+    xhr(options, (err, resp, body) => {
       this.load();
-    }.bind(this));
+    });
   }
 };
 
 
 function _setSelected(files, url) {
-  var selected = null;
+  let selected = null;
   if (files && url) {
     selected = {url: url, files: files};
   }
+
   AppDispatcher.handleViewAction({
     type: Constants.ActionTypes.SELECT,
     selected: selected

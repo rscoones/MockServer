@@ -1,19 +1,18 @@
-let React = require('react');
-let ActionCreator = require('MockServerUI/actions/ActionCreator');
-var Store = require('MockServerUI/stores/Store');
+const React = require('react');
+const ActionCreator = require('MockServerUI/actions/ActionCreator');
+const Store = require('MockServerUI/stores/Store');
 
-let Tooltip = require('react-bootstrap/lib/Tooltip');
-let OverlayTrigger = require('react-bootstrap/lib/OverlayTrigger');
-let verbs = require('MockServerUI/helpers/verbs');
+const Tooltip = require('react-bootstrap/lib/Tooltip');
+const OverlayTrigger = require('react-bootstrap/lib/OverlayTrigger');
 
-var Table = React.createClass({
+const Table = React.createClass({
 
   handleClick(url, e) {
     ActionCreator.select(url);
   },
 
   getFullURL(url) {
-    let tooltip = url.fullURL.replace(url.url, "/");
+    const tooltip = url.fullURL.replace(url.url, "/");
 
     if (tooltip.length > 0) {
       return <Tooltip id={url.url}>{tooltip}</Tooltip>
@@ -22,9 +21,9 @@ var Table = React.createClass({
     }
   },
 
-  render: function() {
-    let {urls} = this.props;
-    let verbs = Store.getVerbs();
+  render() {
+    const {urls} = this.props;
+    const verbs = Store.getVerbs();
 
     return (
       <table className="table table-striped">

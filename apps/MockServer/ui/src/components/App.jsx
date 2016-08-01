@@ -1,15 +1,12 @@
 var React = require('react');
 var Table = require('./Table.jsx');
-var Popup = require('./Popup.jsx');
+var Edit = require('./Edit.jsx');
 var Store = require('MockServerUI/stores/Store');
 var ActionCreator = require('MockServerUI/actions/ActionCreator');
 
 var App = React.createClass({
-  getInitialState: function() {
-    let state = this._getFromStore();
-    state.show = false;
-
-    return state;
+  getInitialState() {
+    return this._getFromStore();
   },
 
   _getFromStore() {
@@ -24,7 +21,7 @@ var App = React.createClass({
   },
 
   componentWillMount() {
-    this.load();
+    ActionCreator.load();
     Store.addChangeListener(this._onChange);
   },
 
@@ -32,17 +29,16 @@ var App = React.createClass({
     Store.removeChangeListener(this._onChange);
   },
 
-  load() {
-    ActionCreator.load();
-  },
-
-  render: function() {
+  render() {
     let {urls, selected} = this.state;
 
     return (
       <div className="container">
-        <Table onClick={this.showPopup} urls={urls} />
-        <Popup selected={selected} />
+        {selected ?
+          <Edit selected={selected} />
+        :
+          <Table urls={urls} />
+        }
       </div>
 
     );
