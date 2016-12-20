@@ -12,7 +12,7 @@ module.exports = {
   plugins: [
     {
       url: "/plugin/",
-      location: path.join(__dirname, "plugin/route")
+      location: path.join(__dirname, "plugin")
     }
   ]
 }

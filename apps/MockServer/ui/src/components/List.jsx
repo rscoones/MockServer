@@ -1,9 +1,8 @@
-const React = require('react');
-const ActionCreator = require('MockServerUI/actions/ActionCreator');
-const Store = require('MockServerUI/stores/Store');
 
-const Tooltip = require('react-bootstrap/lib/Tooltip');
-const OverlayTrigger = require('react-bootstrap/lib/OverlayTrigger');
+import React from 'react';
+import ActionCreator from 'MockServerUI/actions/ActionCreator';
+import Store from 'MockServerUI/stores/Store';
+import {Tooltip, OverlayTrigger} from 'react-bootstrap';
 
 const Table = React.createClass({
 
@@ -17,13 +16,13 @@ const Table = React.createClass({
     if (tooltip.length > 0) {
       return <Tooltip id={url.url}>{tooltip}</Tooltip>
     } else {
-      return <div></div>
+      return <div />
     }
   },
 
-  render() {
-    const {urls} = this.props;
-    const verbs = Store.getVerbs();
+  render: function() {
+    const {routes} = this.props;
+    const {verbs} = Store.get();
 
     return (
       <table className="table table-striped">
@@ -36,7 +35,7 @@ const Table = React.createClass({
           </tr>
         </thead>
         <tbody id="list">
-          {urls.map(url =>
+          {routes.map(url =>
             <tr key={url.url}>
               <td>
                 <OverlayTrigger placement="top" overlay={this.getFullURL(url)}>

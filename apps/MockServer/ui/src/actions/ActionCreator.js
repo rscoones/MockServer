@@ -1,7 +1,7 @@
-const xhr = require('xhr');
-const qs = require('qs');
-const AppDispatcher = require('AppDispatcher');
-const Constants = require('MockServerUI/constants/Constants');
+import xhr from 'xhr';
+import qs from 'qs';
+import AppDispatcher from 'AppDispatcher';
+import Constants from 'MockServerUI/constants/Constants';
 
 module.exports = {
   load() {
@@ -14,7 +14,7 @@ module.exports = {
       const data = JSON.parse(resp.body);
       AppDispatcher.handleViewAction({
         type: Constants.ActionTypes.ADD_URLS,
-        urls: data.urls,
+        routes: data.routes,
         verbs: data.verbs
       });
     });
@@ -36,10 +36,11 @@ module.exports = {
       _setSelected(null, null);
     }
   },
-  save(selected, obj, method) {
-    console.log(selected, obj);
+
+  save(route, obj, method) {
+    console.log(route, obj);
     const data = {
-      url: selected.url.url,
+      url: route.url.url,
       method: method,
       data: JSON.stringify(obj)
     };

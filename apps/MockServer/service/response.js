@@ -5,10 +5,9 @@ var _available = {};
 
 module.exports = {
   get: get,
-  urls: urls,
+  routes: routes,
   isSet: isSet,
-  set: set,
-  data: _data
+  set: set
 };
 
 function get(req) {
@@ -22,7 +21,7 @@ function get(req) {
   return page;
 }
 
-function urls() {
+function routes() {
   return _available;
 }
 

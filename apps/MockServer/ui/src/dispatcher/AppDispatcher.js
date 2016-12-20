@@ -1,7 +1,7 @@
-var Dispatcher = require('flux').Dispatcher;
-var assign = require('object-assign');
+const Dispatcher = require('flux').Dispatcher;
+import assign from 'object-assign';
 
-let AppDispatcher = assign(new Dispatcher(), {
+const AppDispatcher = assign(new Dispatcher(), {
 
   ActionSources: {
     VIEW_ACTION: {}
@@ -17,4 +17,4 @@ let AppDispatcher = assign(new Dispatcher(), {
 
 });
 
-module.exports = AppDispatcher;
+export default AppDispatcher;

@@ -19,7 +19,7 @@ function get(req) {
     if (req.query.url) {
       return getURL(req.query.url);
     } else {
-      return {urls: getAll(req), verbs: verbs};
+      return {routes: getAll(req), verbs: verbs};
     }
   } catch (e) {
     console.log(e);
@@ -49,7 +49,7 @@ function getURL(url) {
 }
 
 function getAll(req) {
-  var available = response.urls();
+  var available = response.routes();
 
   var files = [];
   Object.keys(available).forEach(function(url) {

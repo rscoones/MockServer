@@ -1,23 +1,13 @@
-var React = require('react');
-var Table = require('./Table.jsx');
-var Edit = require('./Edit.jsx');
-var Store = require('MockServerUI/stores/Store');
-var ActionCreator = require('MockServerUI/actions/ActionCreator');
+import React from 'react';
+import List from './List.jsx';
+import Edit from './Edit.jsx';
+import Store from 'MockServerUI/stores/Store';
+import ActionCreator from 'MockServerUI/actions/ActionCreator';
 
-var App = React.createClass({
-  getInitialState() {
-    return this._getFromStore();
-  },
-
-  _getFromStore() {
-    return {
-      urls: Store.get(),
-      selected: Store.getSelected()
-    };
-  },
+const App = React.createClass({
 
   _onChange() {
-    this.setState(this._getFromStore());
+    this.setState({});
   },
 
   componentWillMount() {
@@ -30,17 +20,16 @@ var App = React.createClass({
   },
 
   render() {
-    let {urls, selected} = this.state;
+    const {routes, selected} = Store.get();
 
     return (
       <div className="container">
         {selected ?
-          <Edit selected={selected} />
+          <Edit route={selected} />
         :
-          <Table urls={urls} />
+          <List routes={routes} />
         }
       </div>
-
     );
   }
 

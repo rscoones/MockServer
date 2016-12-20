@@ -1,98 +1,87 @@
-const React = require('react');
-const Button = require('react-bootstrap/lib/Button');
-const Input = require('react-bootstrap/lib/Input');
-const Col = require('react-bootstrap/lib/Col');
-const Nav = require('react-bootstrap/lib/Nav');
-const NavItem = require('react-bootstrap/lib/NavItem');
-const ActionCreator = require('MockServerUI/actions/ActionCreator');
-const Store = require('MockServerUI/stores/Store');
+import React from 'react';
+import FormItem from './FormItem.jsx';
+import {Button, Nav, NavItem, Col} from 'react-bootstrap';
+import ActionCreator from 'MockServerUI/actions/ActionCreator';
+import Store from 'MockServerUI/stores/Store';
 
 const Edit = React.createClass({
   getInitialState() {
     return {
-      current: {},
+      mock: {},
       method: "GET"
     };
   },
 
   componentWillMount() {
-    const {selected} = this.props;
+    const {route} = this.props;
 
-    if (selected && selected.url) {
-      let method = null;
-      const verbs = Store.getVerbs();
+    if (route && route.url) {
+      const {verbs} = Store.get();
+      const method = verbs[0];
 
-      for (let i = 0; i < verbs.length; i++) {
-        const verb = verbs[i];
-        if (selected.url[verb]) {
-          method = verb;
-          break;
-        }
-      }
-
-      this.setState({method: method});
-      this.setCurrent(selected.url[method]);
+      this.setState({method});
+      this.setMock(route.url[method]);
     }
   },
 
-  setCurrent(data) {
-    const current = {
+  setMock(data) {
+    const mock = {
       headers: JSON.stringify(data.headers, null, 2),
       status: data.status,
       type: data.type,
       body: JSON.stringify(data.body, null, 2)
     };
 
-    this.setState({current: current});
+    this.setState({mock});
   },
 
   handlePreset(e) {
     const {value} = e.target;
-    const {files} = this.props.selected;
+    const {files} = this.props.route;
     const {method} = this.state;
 
-    const selected = files[method][value];
+    const route = files[method][value];
 
-    this.setCurrent(selected.data);
+    this.setMock(route.data);
   },
 
   handleHeaders(e) {
     const {value} = e.target;
-    const {current} = this.state;
-    current.headers = value;
+    const {mock} = this.state;
+    mock.headers = value;
 
-    this.setState({current: current});
+    this.setState({mock});
   },
 
   handleType(e) {
     const {value} = e.target;
-    const {current} = this.state;
-    current.type = value;
+    const {mock} = this.state;
+    mock.type = value;
 
-    this.setState({current: current});
+    this.setState({mock});
   },
 
   handleStatus(e) {
     const {value} = e.target;
-    const {current} = this.state;
-    current.status = value;
+    const {mock} = this.state;
+    mock.status = value;
 
-    this.setState({current: current});
+    this.setState({mock});
   },
 
   handleBody(e) {
     const {value} = e.target;
-    const {current} = this.state;
-    current.body = value;
+    const {mock} = this.state;
+    mock.body = value;
 
-    this.setState({current: current});
+    this.setState({mock});
   },
 
   handleMethod(method) {
     this.setState({method: method});
-    const {selected} = this.props;
+    const {route} = this.props;
 
-    this.setCurrent(selected.url[method]);
+    this.setMock(route.url[method]);
   },
 
   saveAndClose() {
@@ -101,61 +90,65 @@ const Edit = React.createClass({
   },
 
   save() {
-    const {selected} = this.props;
-    const {current, method} = this.state;
-    current.headers = JSON.parse(current.headers);
-    current.body = JSON.parse(current.body);
-    ActionCreator.save(selected, current, method);
+    const {route} = this.props;
+    const {mock, method} = this.state;
+    mock.headers = JSON.parse(mock.headers);
+    mock.body = JSON.parse(mock.body);
+    ActionCreator.save(route, mock, method);
   },
 
   close() {
-    this.setState({current: {}});
+    this.setState({mock: {}});
     ActionCreator.select(null);
   },
 
-  render: function() {
-    const {selected} = this.props;
-    const {current, method} = this.state;
-    const verbs = Store.getVerbs();
+  render() {
+    const {route} = this.props;
+    const {mock, method} = this.state;
+    const {verbs} = Store.get();
 
     return (
       <div>
-        <h3>{selected.url.fullURL}</h3>
         <form role="form">
+          <Col md={12}>
+            <h3>{route.url.fullURL}</h3>
+          </Col>
           <Col md={12}>
             <div className="form-group">
               <label>Method:</label>
-              <Nav bsStyle='pills' activeKey={method} onSelect={this.handleMethod}>
+              <Nav bsStyle="pills" activeKey={method} onSelect={this.handleMethod}>
                 {verbs.map((verb, i) =>
-                  selected.url[verb] ? <NavItem key={i} eventKey={verb}>{verb}</NavItem> : null
+                  route.url[verb] ? <NavItem key={i} eventKey={verb}>{verb}</NavItem> : null
                 )}
               </Nav>
             </div>
           </Col>
           <Col md={12}>
-            <Input type="select" label="Preset:" onChange={this.handlePreset}>
-              <option>Select...</option>
-              {selected.files[method].map((file, i) =>
+            <FormItem type="select" label="Preset:" onChange={this.handlePreset}>
+              <option value="-1">Select...</option>
+              {route.files[method].map((file, i) =>
                 <option key={file.filename} value={i}>{file.filename}</option>
               )}
-            </Input>
+            </FormItem>
           </Col>
           <Col md={12}>
-            <Input type='textarea' label='Headers:' value={current.headers} onChange={this.handleHeaders} />
+            <FormItem type="textarea" label="Headers:" value={mock.headers} onChange={this.handleHeaders} />
           </Col>
           <Col md={6}>
-            <Input type="text" label="File type:" value={current.type} onChange={this.handleType} />
+            <FormItem type="text" label="File type:" value={mock.type} onChange={this.handleType} />
           </Col>
           <Col md={6}>
-            <Input type="text" label="Status:" value={current.status} onChange={this.handleStatus} />
+            <FormItem type="text" label="Status:" value={mock.status} onChange={this.handleStatus} />
           </Col>
           <Col md={12}>
-            <Input type='textarea' label='Body:' rows={6} value={current.body} onChange={this.handleBody} />
+            <FormItem type="textarea" label="Body:" rows={6} value={mock.body} onChange={this.handleBody} />
+          </Col>
+          <Col md={12}>
+            <Button onClick={this.close} className="pull-left" style={{marginRight: 11}}>Cancel</Button>
+            <Button onClick={this.saveAndClose} bsStyle="primary" className="pull-right">Save and Close</Button>
           </Col>
         </form>
 
-        <Button onClick={this.close} className="pull-left">Cancel</Button>
-        <Button onClick={this.saveAndClose} bsStyle='primary'>Save and Close</Button>
       </div>
     );
   }

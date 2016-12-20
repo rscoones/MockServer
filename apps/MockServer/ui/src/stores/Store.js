@@ -1,42 +1,35 @@
-var BaseStore = require('./BaseStore');
-var assign = require('object-assign');
-var AppDispatcher = require('AppDispatcher');
-var Constants = require('MockServerUI/constants/Constants');
+import BaseStore from './BaseStore';
+import assign from 'object-assign';
+import AppDispatcher from 'AppDispatcher';
+import Constants from 'MockServerUI/constants/Constants';
 
 let _data = [];
 let _verbs = [];
-
 let _selected = null;
 
-let Store = assign({}, BaseStore, {
+const Store = assign({}, BaseStore, {
   get() {
-    return _data;
-  },
-
-  getVerbs() {
-    return _verbs;
-  },
-
-  getSelected() {
-    return  _selected;
+    return {
+      routes: _data,
+      selected: _selected,
+      verbs: _verbs
+    }
   },
 
   // register store with dispatcher
   dispatcherIndex: AppDispatcher.register(function(payload) {
     let action = payload.action;
 
-    let {urls, verbs, selected} = action;
+    const {routes, verbs, selected} = action;
 
     switch(action.type) {
       case Constants.ActionTypes.ADD_URLS:
-        _data = urls;
+        _data = routes;
         _verbs = verbs;
-        Store.emitChange();
-        break;
+        return Store.emitChange();
       case Constants.ActionTypes.SELECT:
         _selected = selected
-        Store.emitChange();
-        break;
+        return Store.emitChange();
     }
   })
 });
