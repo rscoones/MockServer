@@ -2,7 +2,7 @@ var Q = require('q');
 
 module.exports = function(req, config) {
   var obj = {
-    headers: [],
+    headers: {},
     status: 200,
     body: {
       test: "deferred"

@@ -1,4 +1,5 @@
 var session = require('./context');
+var parseMock = require('../helpers/parseMock');
 
 var _data = {};
 var _available = {};
@@ -11,14 +12,9 @@ module.exports = {
 };
 
 function get(req) {
-
   var page = getData(req)[req.method];
 
-  if (typeof page === "function") {
-    page = page(req);
-  }
-
-  return page;
+  return parseMock(page, req);
 }
 
 function routes() {

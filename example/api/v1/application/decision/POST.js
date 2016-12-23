@@ -1,5 +1,5 @@
 module.exports = {
-  headers: [],
+  headers: {},
   status: 200,
   body: {
     success: true

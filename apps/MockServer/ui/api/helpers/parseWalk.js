@@ -1,6 +1,6 @@
 var path = require('path');
 var verbs = require('../helpers/MockServer').verbs;
-
+var parseMock = require('./parseMock');
 
 module.exports = function(files) {
   var arr = [];
@@ -24,16 +24,12 @@ function addFile(arr, file) {
     var filename = file.file.replace(".js", "");
 
     var data = require(path.join(file.folder, filename));
-    var isFunction = typeof data === "function";
-    if (isFunction) {
-      data = data({});
-    }
+    data = parseMock(data);
 
     arr.push({
       filename: filename,
       folder: file.folder,
       method: method,
-      isFunction: isFunction,
       data: data
     });
   }
