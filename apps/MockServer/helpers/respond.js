@@ -1,8 +1,8 @@
 var found = require('./found');
-var Q = require('q');
+var isPromise = require('./isPromise');
 
 module.exports = function(req, res, obj) {
-  if (Q.isPromise(obj)) {
+  if (isPromise(obj)) {
     obj.then(function(data) {
       respond(req, res, data);
     })

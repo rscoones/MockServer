@@ -1,5 +1,3 @@
-var Q = require('q');
-
 module.exports = function(req, config) {
   var obj = {
     headers: {},
@@ -9,11 +7,9 @@ module.exports = function(req, config) {
     }
   };
 
-  var deferred = Q.defer();
-
-  setTimeout(function() {
-    deferred.resolve(obj);
-  }, 2000)
-
-  return deferred.promise;
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      resolve(obj);
+    }, 2000)
+  });
 };
