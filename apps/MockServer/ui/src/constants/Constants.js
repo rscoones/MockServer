@@ -1,7 +1,10 @@
+export const ADD_URLS = {};
+export const SELECT = {};
+export const SET_VALUE = {};
+
 
 export default {
-  ActionTypes: {
-    ADD_URLS: {},
-    SELECT: {}
-  }
+  ADD_URLS,
+  SELECT,
+  SET_VALUE
 }

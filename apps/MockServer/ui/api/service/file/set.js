@@ -1,3 +1,4 @@
+var path = require('path');
 var response = require('../../helpers/MockServer').response;
 var config = require('../../helpers/MockServer').config;
 
@@ -5,7 +6,7 @@ module.exports = function(req) {
   console.log("SET", req.body.url);
   if (req.body.data) {
     return setData(req);
-  } else if (req.body.file) {
+  } else if (req.body.filename) {
     return setFile(req);
   }
 
@@ -23,9 +24,9 @@ function setData(req) {
 
 function setFile(req) {
   var method = req.body.method;
-  var file = path.joint(config.base.location, req.body.file);
+  var file = path.join(config.base.location, req.body.url, req.body.filename);
 
-  response.set(fakeReq(req), method, file);
+  response.set(fakeReq(req), method, require(file));
 
   return {success: true};
 }

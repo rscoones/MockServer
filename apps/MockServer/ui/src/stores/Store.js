@@ -18,17 +18,19 @@ const Store = assign({}, BaseStore, {
 
   // register store with dispatcher
   dispatcherIndex: AppDispatcher.register(function(payload) {
-    let action = payload.action;
-
-    const {routes, verbs, selected} = action;
+    const action = payload.action;
+    const {routes, verbs, selected, obj, key, value} = action;
 
     switch(action.type) {
-      case Constants.ActionTypes.ADD_URLS:
+      case Constants.ADD_URLS:
         _data = routes;
         _verbs = verbs;
         return Store.emitChange();
-      case Constants.ActionTypes.SELECT:
+      case Constants.SELECT:
         _selected = selected
+        return Store.emitChange();
+      case Constants.SET_VALUE:
+        obj[key] = value;
         return Store.emitChange();
     }
   })

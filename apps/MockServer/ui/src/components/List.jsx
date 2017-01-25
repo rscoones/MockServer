@@ -1,13 +1,12 @@
-
 import React from 'react';
-import ActionCreator from 'MockServerUI/actions/ActionCreator';
+import WebApi from 'MockServerUI/services/WebApi';
 import Store from 'MockServerUI/stores/Store';
 import {Tooltip, OverlayTrigger} from 'react-bootstrap';
 
 const Table = React.createClass({
 
   handleClick(url, e) {
-    ActionCreator.select(url);
+    WebApi.select(url);
   },
 
   getFullURL(url) {

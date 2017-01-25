@@ -1,87 +1,37 @@
 import React from 'react';
-import FormItem from './FormItem.jsx';
 import {Button, Nav, NavItem, Col} from 'react-bootstrap';
+// components
+import FormItem from './FormItem.jsx';
+import EditFields from './EditFields.jsx';
+import EditWarning from './EditWarning.jsx';
+// stores
 import ActionCreator from 'MockServerUI/actions/ActionCreator';
+import WebApi from 'MockServerUI/services/WebApi';
 import Store from 'MockServerUI/stores/Store';
 
 const Edit = React.createClass({
   getInitialState() {
+    const {route} = this.props;
+    const {verbs} = Store.get();
+    const method = verbs[0];
+    const mock = this.getMock(route.url[method]);
+
     return {
-      mock: {},
-      method: "GET"
+      mock: mock,
+      method: method,
+      showEdit: mock.mockServerType === "object",
+      preset: null
     };
   },
 
-  componentWillMount() {
-    const {route} = this.props;
-
-    if (route && route.url) {
-      const {verbs} = Store.get();
-      const method = verbs[0];
-
-      this.setState({method});
-      this.setMock(route.url[method]);
-    }
-  },
-
-  setMock(data) {
-    const mock = {
+  getMock(data) {
+    return {
       headers: JSON.stringify(data.headers, null, 2),
       status: data.status,
       type: data.type,
+      mockServerType: data.mockServerType,
       body: JSON.stringify(data.body, null, 2)
     };
-
-    this.setState({mock});
-  },
-
-  handlePreset(e) {
-    const {value} = e.target;
-    const {files} = this.props.route;
-    const {method} = this.state;
-
-    const route = files[method][value];
-
-    this.setMock(route.data);
-  },
-
-  handleHeaders(e) {
-    const {value} = e.target;
-    const {mock} = this.state;
-    mock.headers = value;
-
-    this.setState({mock});
-  },
-
-  handleType(e) {
-    const {value} = e.target;
-    const {mock} = this.state;
-    mock.type = value;
-
-    this.setState({mock});
-  },
-
-  handleStatus(e) {
-    const {value} = e.target;
-    const {mock} = this.state;
-    mock.status = value;
-
-    this.setState({mock});
-  },
-
-  handleBody(e) {
-    const {value} = e.target;
-    const {mock} = this.state;
-    mock.body = value;
-
-    this.setState({mock});
-  },
-
-  handleMethod(method) {
-    this.setState({method: method});
-    const {route} = this.props;
-
-    this.setMock(route.url[method]);
   },
 
   saveAndClose() {
@@ -91,10 +41,14 @@ const Edit = React.createClass({
 
   save() {
     const {route} = this.props;
-    const {mock, method} = this.state;
-    mock.headers = JSON.parse(mock.headers);
-    mock.body = JSON.parse(mock.body);
-    ActionCreator.save(route, mock, method);
+    const {mock, method, preset} = this.state;
+    if (preset) {
+      WebApi.savePreset(route, method, preset);
+    } else {
+      mock.headers = JSON.parse(mock.headers);
+      mock.body = JSON.parse(mock.body);
+      WebApi.save(route, method, mock);
+    }
   },
 
   close() {
@@ -102,9 +56,32 @@ const Edit = React.createClass({
     ActionCreator.select(null);
   },
 
+  handlePreset(e) {
+    const {value} = e.target;
+    const {files} = this.props.route;
+    const {method} = this.state;
+    const route = files[method][value];
+
+    const mock = this.getMock(route.data);
+    const showEdit = mock.mockServerType == "object";
+    const preset = route.filename
+    this.setState({mock, showEdit, preset});
+  },
+
+  handleEditAnyway() {
+    this.setState({showEdit: true, preset: null});
+  },
+
+  handleMethod(method) {
+    const {route} = this.props;
+    const mock = this.getMock(route.url[method]);
+
+    this.setState({method, mock});
+  },
+
   render() {
     const {route} = this.props;
-    const {mock, method} = this.state;
+    const {mock, method, showEdit} = this.state;
     const {verbs} = Store.get();
 
     return (
@@ -131,18 +108,11 @@ const Edit = React.createClass({
               )}
             </FormItem>
           </Col>
-          <Col md={12}>
-            <FormItem type="textarea" label="Headers:" value={mock.headers} onChange={this.handleHeaders} />
-          </Col>
-          <Col md={6}>
-            <FormItem type="text" label="File type:" value={mock.type} onChange={this.handleType} />
-          </Col>
-          <Col md={6}>
-            <FormItem type="text" label="Status:" value={mock.status} onChange={this.handleStatus} />
-          </Col>
-          <Col md={12}>
-            <FormItem type="textarea" label="Body:" rows={6} value={mock.body} onChange={this.handleBody} />
-          </Col>
+          {showEdit ?
+            <EditFields mock={mock} />
+          :
+            <EditWarning mock={mock} onClick={this.handleEditAnyway}/>
+          }
           <Col md={12}>
             <Button onClick={this.close} className="pull-left" style={{marginRight: 11}}>Cancel</Button>
             <Button onClick={this.saveAndClose} bsStyle="primary" className="pull-right">Save and Close</Button>

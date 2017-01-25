@@ -6,7 +6,7 @@
   "main": "./apps/MockServer/server.js",
   "scripts": {
     "start": "node node_modules/gulp/bin/gulp.js --gulpfile example/gulpfile.js",
-    "build-ui": "node node_modules/webpack/bin/webpack.js --config apps/MockServerUI/js/webpack.config.js"
+    "build-ui": "node node_modules/webpack/bin/webpack.js --config=apps/MockServer/ui/webpack.config.js"
   },
   "repository": {
     "type": "git",

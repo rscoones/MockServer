@@ -2,7 +2,7 @@ import React from 'react';
 import List from './List.jsx';
 import Edit from './Edit.jsx';
 import Store from 'MockServerUI/stores/Store';
-import ActionCreator from 'MockServerUI/actions/ActionCreator';
+import WebApi from 'MockServerUI/services/WebApi';
 
 const App = React.createClass({
 
@@ -11,7 +11,7 @@ const App = React.createClass({
   },
 
   componentWillMount() {
-    ActionCreator.load();
+    WebApi.load();
     Store.addChangeListener(this._onChange);
   },
 

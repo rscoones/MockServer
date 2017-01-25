@@ -7,7 +7,6 @@ var cors = require('cors');
 var initConfig = require('./helpers/config');
 var makeRoutes = require('./helpers/makeRoutes');
 var config = require('./config');
-require('es6-promise').polyfill();
 
 module.exports = {
   start: function(conf) {
