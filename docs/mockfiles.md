@@ -39,8 +39,9 @@ Properties can have dynamic values set to them. However with the object approach
 ###Function approach
 This approach gives you much more flexibility. Values can be fully dynamic from point of call rather than boot time. The request object from express is also exposed.
 ```
-module.exports = function(req, config) {
-  var body = service.get(req.params.id);
+module.exports = (req, config) => {
+  const body = service.get(req.params.id);
+
   return {
     headers: {},
     status: (body) ? 200 : 500,
@@ -54,20 +55,15 @@ The request object can be used to find anything from query strings to cookies to
 Sometimes you might want to hold the server response until you have completed an async task. If your file returns a promise, this can be achieved.
 Q is used internally but any promise/A+ will resolve fine.
 ```
-var Q = require('q');
-module.exports = function(req, config) {
-  var obj = {
+module.exports = (req, config) => {
+  const obj = {
     headers: {},
     status: 200,
     body: {test: "deferred"}
   };
 
-  var deferred = Q.defer();
-
-  setTimeout(function() {
-    deferred.resolve(obj);
-  }, 2000)
-
-  return deferred.promise;
+  return new Promise((resolve, reject) => {
+    resolve(obj);
+  });
 };
 ```

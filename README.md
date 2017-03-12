@@ -1,15 +1,14 @@
-#MockServer
+#MockApiServer
 Simple quick mocking server running on node
 
 ###Example Start:
 ```
-  require('./apps/MockServer/server.js').start(config);
+  require('mockapiserver').start(config);
 ```
 or
 ```
   var gulp = require('gulp');
-  var MockServer = require('./apps/MockServer/server.js');
-  var config = require('./config.js');
+  var MockServer = require('mockapiserver');
 
   gulp.task('mock', function() {
     MockServer.start(config);
