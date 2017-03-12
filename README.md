@@ -45,7 +45,7 @@ module.exports = {
 
 #Release Notes
 
-##v0.3
+##v1.0 (formally v0.3)
 - Mock files now support promise returns (in addition to objects and functions)
 - Session support via config.session property. If enabled each user gets a individual instance of mocks.
 - Breaking Change: Plugins now have the express 'res' object exposed to them instead of being tied to Mock file type.
