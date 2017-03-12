@@ -1,5 +1,5 @@
 {
-  "name": "MockServer",
+  "name": "mockapiserver",
   "version": "1.0.0",
   "description": "A quick and simple yet highly customisable mocking server for APIs",
   "author": "Richard Scoones <richard.scoones@gmail.com>",

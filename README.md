@@ -49,6 +49,9 @@ module.exports = {
 - Mock files now support promise returns (in addition to objects and functions)
 - Session support via config.session property. If enabled each user gets a individual instance of mocks.
 - Breaking Change: Plugins now have the express 'res' object exposed to them instead of being tied to Mock file type.
+- async responding via promises
+- Support for user context based queries via cookie/sessions
+- npm packaging
 
 ##v0.2
 - Support for dynamic URLs using express routing via req.params
@@ -63,12 +66,10 @@ module.exports = {
 
 ##Planned
 
-#### v0.3
-- async responding via promises (done)
-- Support for user context based queries via cookie/sessions (done)
-- Automatic raml parsing (on hold)
-- npm packaging (on hold)
+#### v0.3 / v1.0
+- Automatic raml parsing (pushed to v1.1)
 
-#### v0.4
+#### v1.1
+- Automatic raml parsing (on hold)
 - UI extensions => Create new URLs in flight
 - UI extensions => Save newly created URLs in flight
