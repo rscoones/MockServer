@@ -1,6 +1,6 @@
 {
   "name": "mockapiserver",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A quick and simple yet highly customisable mocking server for APIs",
   "author": "Richard Scoones <richard.scoones@gmail.com>",
   "main": "./server",
