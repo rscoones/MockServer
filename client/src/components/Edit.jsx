@@ -13,7 +13,13 @@ const Edit = React.createClass({
   getInitialState() {
     const {route} = this.props;
     const {verbs} = Store.get();
-    const method = verbs[0];
+    let method = null;
+    for (let i = 0; i < verbs.length; i++) {
+      if (route.url[verbs[i]]) {
+        method = verbs[i];
+        break;
+      }
+    }
     const mock = this.getMock(route.url[method]);
 
     return {
