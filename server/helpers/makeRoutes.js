@@ -39,6 +39,7 @@ function makeFromFiles(app) {
 
     if (method) {
       var route = "/" + file.folder.replace(file.base, "").replace(/\\/g, "/");
+      route = route.replace(/\/\//g, "/"); // replace double '/' => mac issue?
       route = convert.toURL(route)
       route = config.base.url.replace(/\/$/, "") + route;
       var data = require(path.join(file.folder, file.file.replace(".js", "")));
