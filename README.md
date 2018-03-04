@@ -73,5 +73,5 @@ module.exports = {
 
 #### Benched
 - Automatic raml parsing (on hold)
-- UI extensions => Create new URLs in flight
-- UI extensions => Save newly created URLs in flight
+- UI extensions => Create new URLs in flight (Too many security risks)
+- UI extensions => Save newly created URLs in flight (Far too many security risks)
