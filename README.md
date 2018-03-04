@@ -65,10 +65,13 @@ module.exports = {
 
 ## Planned
 
-#### v0.3 / v1.0
-- Automatic raml parsing (pushed to v1.1)
-
 #### v1.1
+- Add a true URL property.
+ - Add a proxy to handle this
+ - This will let us switch between MockServer and real servers seamlessly
+
+
+#### Benched
 - Automatic raml parsing (on hold)
-- UI extensions => Create new URLs in flight
-- UI extensions => Save newly created URLs in flight
+- UI extensions => Create new URLs in flight (Too many security risks)
+- UI extensions => Save newly created URLs in flight (Far too many security risks)
