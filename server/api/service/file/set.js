@@ -1,6 +1,7 @@
 var path = require('path');
 var response = require('../../helpers/MockServer').response;
 var config = require('../../helpers/MockServer').config;
+var convertParams = require("../../../helpers/convert/params")
 
 module.exports = function(req) {
   console.log("SET", req.body.url);
@@ -24,7 +25,7 @@ function setData(req) {
 
 function setFile(req) {
   var method = req.body.method;
-  var file = path.join(config.base.location, req.body.url, req.body.filename);
+  var file = path.join(config.base.location, convertParams.toFolder(req.body.url), req.body.filename);
 
   response.set(fakeReq(req), method, require(file));
 
