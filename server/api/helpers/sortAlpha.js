@@ -1,12 +1,12 @@
 module.exports = function(arr, key) {
-  arr.sort(function(a, b) {
+  arr.sort((a, b) => {
     if (a[key] > b[key]) {
       return 1;
     } else if (a[key] < b[key]) {
       return -1;
-    } else {
-      return 0;
     }
+
+    return 0
   });
 
   return arr;

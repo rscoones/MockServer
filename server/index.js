@@ -1,19 +1,19 @@
-'use strict';
-var path = require('path');
+const path = require("path");
 // vendor
-var express = require('express');
-var bodyParser = require('body-parser');
-var cors = require('cors');
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const session = require("express-session");
 // helpers
-var initConfig = require('./helpers/config');
-var makeRoutes = require('./helpers/makeRoutes');
-var config = require('./config');
+const initConfig = require("./helpers/config");
+const makeRoutes = require("./helpers/makeRoutes");
+const config = require("./config");
 
 module.exports = {
   start: function(conf) {
     initConfig(conf);
 
-    var app = createServer();
+    const app = createServer();
 
     if (config.session) {
       sessionfy(app);
@@ -28,18 +28,16 @@ module.exports = {
 };
 
 function createServer() {
-  var app = express();
+  const app = express();
 
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(config.ui, express.static(path.join(__dirname, 'public')));
+  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(config.ui.pathname, express.static(path.join(__dirname, 'public')));
 
   return app;
 }
 
 function sessionfy(app) {
-  var session = require('express-session');
-
   setValue(config.session, 'secret', "keyboard cat");
   setValue(config.session, 'name', "MockServer");
   setValue(config.session, 'cookie', {secure: false});
@@ -49,14 +47,14 @@ function sessionfy(app) {
   app.use(session(config.session));
 
   function setValue(obj, key, defaultValue) {
-    if(typeof obj[key] === "undefined") {
+    if (typeof obj[key] === "undefined") {
       obj[key] = defaultValue;
     }
   }
 }
 
 function startServer(app) {
-  var server = app.listen(config.port, function () {
+  app.listen(config.port, () => {
     console.log("");
     console.log("==============================================");
     console.log('Mock server running at: http://localhost:%s', config.port);

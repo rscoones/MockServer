@@ -1,7 +1,7 @@
-var path = require('path');
-var response = require('../../helpers/MockServer').response;
-var config = require('../../helpers/MockServer').config;
-var convertParams = require("../../../helpers/convert/params")
+const path = require('path');
+const response = require('../../helpers/MockServer').response;
+const config = require('../../helpers/MockServer').config;
+const convertParams = require("../../../helpers/convert/params")
 
 module.exports = function(req) {
   console.log("SET", req.body.url);
@@ -15,8 +15,8 @@ module.exports = function(req) {
 }
 
 function setData(req) {
-  var method = req.body.method;
-  var data = JSON.parse(req.body.data);
+  const method = req.body.method;
+  const data = JSON.parse(req.body.data);
 
   response.set(fakeReq(req), method, data);
 
@@ -24,8 +24,8 @@ function setData(req) {
 }
 
 function setFile(req) {
-  var method = req.body.method;
-  var file = path.join(config.base.location, convertParams.toFolder(req.body.url), req.body.filename);
+  const method = req.body.method;
+  const file = path.join(config.base.location, convertParams.toFolder(req.body.url), req.body.filename);
 
   response.set(fakeReq(req), method, require(file));
 
@@ -33,5 +33,5 @@ function setFile(req) {
 }
 
 function fakeReq(req) {
-  return {path: config.base.url + req.body.url, session: req.session};
+  return {path: config.base.pathname + req.body.url, session: req.session};
 }

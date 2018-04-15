@@ -1,10 +1,10 @@
-var path = require('path');
-var verbs = require('../helpers/MockServer').verbs;
-var parseMock = require('./parseMock');
+const path = require('path');
+const {config} = require('../helpers/MockServer');
+const parseMock = require('./parseMock');
 
 module.exports = function(files) {
-  var arr = [];
-  files.forEach(function(file) {
+  const arr = [];
+  files.forEach((file) => {
     addFile(arr, file);
   });
 
@@ -12,18 +12,18 @@ module.exports = function(files) {
 }
 
 function addFile(arr, file) {
-  var method;
-  for (var i = 0; i < verbs.length; i++) {
-    if (file.file.indexOf(verbs[i]) > -1) {
-      method = verbs[i];
+  let method
+  for (let i = 0; i < config.verbs.length; i++) {
+    if (file.file.indexOf(config.verbs[i]) > -1) {
+      method = config.verbs[i];
       break;
     }
   }
 
   if (method && file.folder.replace(file.base, "") === "") {
-    var filename = file.file.replace(".js", "");
+    const filename = file.file.replace(".js", "");
 
-    var data = require(path.join(file.folder, filename));
+    let data = require(path.join(file.folder, filename));
     data = parseMock(data);
 
     arr.push({

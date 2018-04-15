@@ -1,10 +1,10 @@
-var config = require('../../config');
+const config = require('../../config');
 
 module.exports = function(conf) {
   if (!conf) {
-    throw "Config Error: No config given";
+    throw new Error("Config Error: No config given");
   }
-  Object.keys(conf).forEach(function(key) {
+  Object.keys(conf).forEach((key) => {
     config[key] = conf[key];
   });
 
@@ -13,16 +13,18 @@ module.exports = function(conf) {
   }
 
   if (!config.base) {
-    throw "Config Error: 'base' property required";
-  }
-
-  if (!config.base.location) {
-    throw "Config Error: 'base.location' property required";
+    throw new Error("Config Error: 'base' property required");
   }
 
   if (!config.ui) {
-    config.ui = "/portal/";
+    config.ui = {pathname: "/portal/"};
     console.warn("Config warning: ui prefix not set, defaulting to /portal/")
+  }
+
+  if (typeof config.ui === "string") {
+    config.ui = {pathname: config.ui}
+    // @TODO: Remove post v1.1, People should update their config.
+    console.warn("Config warning: UI property is now an object. Future versions will break.")
   }
 
   if (!config.port) {

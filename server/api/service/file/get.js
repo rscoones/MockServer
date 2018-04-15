@@ -1,61 +1,58 @@
-var path = require('path');
-var walk = require('rs-filewalk');
+const path = require('path');
+const walk = require('rs-filewalk');
 
-var parseWalk = require('../../helpers/parseWalk');
-var sortAlpha = require('../../helpers/sortAlpha');
-var MockServer = require('../../helpers/MockServer');
-var response = MockServer.response;
-var verbs = MockServer.verbs;
-var convert = MockServer.convert;
-var config = MockServer.config;
+const parseWalk = require('../../helpers/parseWalk');
+const sortAlpha = require('../../helpers/sortAlpha');
+const {response, convert, config} = require('../../helpers/MockServer');
 
 module.exports = function(req) {
   try {
     if (req.query.url) {
-      return get(req.query.url);
-    } else {
-      return {routes: getAll(req), verbs: verbs};
+      return get(req.query.url)
     }
+
+    const {verbs, services} = config
+    return {routes: getAll(req), verbs, services}
   } catch (e) {
-    console.log(e);
-    return {error: "Not Found"};
+    console.log(e)
+    return {error: "Not Found"}
   }
 }
 
 function get(url) {
-  url = convert.toFolder(url);
-  var files = parseWalk(walk(path.join(config.base.location, url)));
+  url = convert.toFolder(url)
+  const files = parseWalk(walk(path.join(config.base.location, url)))
 
-  var obj = {};
-  verbs.forEach(function(verb) {
-    obj[verb] = [];
+  const obj = {}
+  config.verbs.forEach((verb) => {
+    obj[verb] = []
   })
 
-  files.forEach(function(file) {
-    file.folder = url;
-    obj[file.method].push(file);
+  files.forEach((file) => {
+    file.folder = url
+    obj[file.method].push(file)
   });
 
-  Object.keys(obj).forEach(function(key) {
-    sortAlpha(obj[key], "filename");
+  Object.keys(obj).forEach((key) => {
+    sortAlpha(obj[key], "filename")
   });
 
-  return obj;
+  return obj
 }
 
 function getAll(req) {
-  var available = response.routes();
+  const available = response.routes();
 
-  var files = [];
-  Object.keys(available).forEach(function(url) {
-    var file = {
-      url: url.replace(config.base.url, ""),
+  const files = [];
+  Object.keys(available).forEach((url) => {
+    const file = {
+      url: url.replace(config.base.pathname, ""),
       fullURL: url
     };
 
-    var methods = available[url];
-    Object.keys(methods).forEach(function(method) {
-      var fakeReq = {path: url, method: method, params: {}, session: req.session};
+    const methods = available[url];
+    Object.keys(methods).forEach((method) => {
+      const fakeReq = {path: url, method: method, params: {}, session: req.session};
       file[method] = response.get(fakeReq, config);
     });
     files.push(file);

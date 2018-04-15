@@ -9,8 +9,14 @@ import ActionCreator from 'MockServerUI/actions/ActionCreator';
 import WebApi from 'MockServerUI/services/WebApi';
 import Store from 'MockServerUI/stores/Store';
 
-const Edit = React.createClass({
-  getInitialState() {
+export default class Edit extends React.Component {
+  constructor(props) {
+    super(props)
+    this.getMock = this.getMock.bind(this)
+    this.saveAndClose = this.saveAndClose.bind(this)
+    this.save = this.save.bind(this)
+    this.close = this.close.bind(this)
+
     const {route} = this.props;
     const {verbs} = Store.get();
     let method = null;
@@ -22,13 +28,13 @@ const Edit = React.createClass({
     }
     const mock = this.getMock(route.url[method]);
 
-    return {
+    this.state = {
       mock: mock,
       method: method,
       showEdit: mock.mockServerType === 'object',
       preset: null
-    };
-  },
+    }
+  }
 
   getMock(data) {
     return {
@@ -38,12 +44,12 @@ const Edit = React.createClass({
       mockServerType: data.mockServerType,
       body: JSON.stringify(data.body, null, 2)
     };
-  },
+  }
 
   saveAndClose() {
     this.save();
     this.close();
-  },
+  }
 
   save() {
     const {route} = this.props;
@@ -55,12 +61,12 @@ const Edit = React.createClass({
       mock.body = JSON.parse(mock.body);
       WebApi.save(route, method, mock);
     }
-  },
+  }
 
   close() {
     this.setState({mock: {}});
     ActionCreator.select(null);
-  },
+  }
 
   handlePreset(e) {
     const {value} = e.target;
@@ -72,18 +78,18 @@ const Edit = React.createClass({
     const showEdit = mock.mockServerType === 'object';
     const preset = route.filename;
     this.setState({mock, showEdit, preset});
-  },
+  }
 
   handleEditAnyway() {
     this.setState({showEdit: true, preset: null});
-  },
+  }
 
   handleMethod(method) {
     const {route} = this.props;
     const mock = this.getMock(route.url[method]);
 
     this.setState({method, mock});
-  },
+  }
 
   render() {
     const {route} = this.props;
@@ -128,7 +134,4 @@ const Edit = React.createClass({
       </div>
     );
   }
-
-});
-
-module.exports = Edit;
+}

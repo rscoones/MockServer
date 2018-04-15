@@ -1,7 +1,7 @@
 module.exports = function(mock) {
-  var type = "object";
+  let type = "object";
   if (typeof mock === "function") {
-    var fakeReq = {params: {}, query: {}};
+    const fakeReq = {params: {}, query: {}};
     mock = mock(fakeReq);
     type = "function"
   }

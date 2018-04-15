@@ -1,9 +1,9 @@
-var found = require('./found');
-var isPromise = require('./isPromise');
+const found = require('./found');
+const isPromise = require('./isPromise');
 
 module.exports = function(req, res, obj) {
   if (isPromise(obj)) {
-    obj.then(function(data) {
+    obj.then((data) => {
       respond(req, res, data);
     })
   } else {
@@ -38,6 +38,6 @@ function send(req, res, obj) {
   if (found(obj)) {
     console.log(req.method, req.path);
   } else {
-    console.log("NOT FOUND: " + req.method, req.path);
+    console.log(`NOT FOUND: ${req.method}`, req.path);
   }
 }

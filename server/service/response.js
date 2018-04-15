@@ -1,8 +1,8 @@
-var session = require('./context');
-var parseMock = require('../helpers/parseMock');
+const session = require('./context');
+const parseMock = require('../helpers/parseMock');
 
-var _data = {};
-var _available = {};
+const _data = {};
+const _available = {};
 
 module.exports = {
   get: get,
@@ -12,7 +12,7 @@ module.exports = {
 };
 
 function get(req) {
-  var page = getData(req)[req.method];
+  const page = getData(req)[req.method];
 
   return parseMock(page, req);
 }
@@ -34,8 +34,8 @@ function set(req, method, data) {
 }
 
 function getData(req) {
-  var url = req.route ? req.route.path : req.path;
-  var context = "base";
+  const url = req.route ? req.route.path : req.path;
+  let context = "base";
   if (!_data[url]) {
     _data[url] = {};
     _data[url][context] = {};
@@ -52,7 +52,7 @@ function getData(req) {
 }
 
 function getAvailable(req) {
-  var url = req.route ? req.route.path : req.path;
+  const url = req.route ? req.route.path : req.path;
   if (!_available[url]) {
     _available[url] = {};
   }
@@ -60,11 +60,11 @@ function getAvailable(req) {
 }
 
 function copyFromBase(url) {
-  var base = getData({path: url});
+  const base = getData({path: url});
 
-  var copy = {};
-  for (var i in base) {
-    copy[i] = base[i];
-  }
+  const copy = {};
+  Object.keys(base).forEach((key) => {
+    copy[key] = base[key];
+  })
   return copy;
 }

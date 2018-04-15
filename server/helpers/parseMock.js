@@ -1,7 +1,7 @@
-var isPromise = require('./isPromise');
+const isPromise = require('./isPromise');
 
 module.exports = function(mock, req) {
-  var type = "object";
+  let type = "object";
   if (typeof mock === "function") {
     mock = mock(req);
     type = "function";

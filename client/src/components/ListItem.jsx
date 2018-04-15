@@ -1,10 +1,13 @@
 import React from 'react';
 import WebApi from 'MockServerUI/services/WebApi';
 import Store from 'MockServerUI/stores/Store';
-import {Tooltip, OverlayTrigger} from 'react-bootstrap';
+import {Tooltip, OverlayTrigger, Checkbox} from 'react-bootstrap';
 
-const Table = React.createClass({
-
+export default class Table extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
 
   getFullURL(url) {
     const tooltip = url.fullURL.replace(url.url, '/');
@@ -14,11 +17,11 @@ const Table = React.createClass({
     }
 
     return <div />
-  },
+  }
 
   handleClick() {
     WebApi.select(this.props.url);
-  },
+  }
 
   render() {
     const {url} = this.props;
@@ -26,6 +29,9 @@ const Table = React.createClass({
 
     return (
       <tr>
+        <td>
+          <Checkbox checked style={{margin: 0}} />
+        </td>
         <td>
           <OverlayTrigger placement="top" overlay={this.getFullURL(url)}>
             <a href="#" onClick={this.handleClick}>{url.url}</a>
@@ -39,6 +45,4 @@ const Table = React.createClass({
       </tr>
     );
   }
-});
-
-module.exports = Table;
+}

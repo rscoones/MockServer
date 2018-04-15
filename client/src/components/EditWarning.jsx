@@ -10,4 +10,4 @@ const EditWarning = ({onClick, mock}) => {
   );
 };
 
-module.exports = EditWarning;
+export default EditWarning;

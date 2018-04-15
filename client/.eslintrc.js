@@ -12,6 +12,7 @@ module.exports = {
       "default-case": "off",
       "semi": "off",
       "class-methods-use-this": "off",
+      "no-plusplus": 0,
 
       "react/prop-types": "off",
       "react/prefer-es6-class": "off",

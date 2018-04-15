@@ -1,12 +1,13 @@
 import AppDispatcher from 'AppDispatcher';
 import Constants from 'MockServerUI/constants/Constants';
 
-module.exports = {
+export default {
   load(data) {
     AppDispatcher.handleViewAction({
       type: Constants.ADD_URLS,
       routes: data.routes,
-      verbs: data.verbs
+      verbs: data.verbs,
+      services: data.services
     });
   },
 

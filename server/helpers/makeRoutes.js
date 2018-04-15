@@ -1,51 +1,60 @@
-var path = require('path');
-var response = require('../service/response');
-var respond = require('./respond');
-var walk = require('rs-filewalk');
-var config = require('../config');
-var NotFound = require('./responses/NotFound');
-var convert = require('./convert/params');
+const path = require("path")
+const walk = require('rs-filewalk')
+
+const UIAPI = require("../api/index")
+const response = require('../service/response')
+const respond = require('./respond')
+const config = require('../config')
+const NotFound = require('./responses/NotFound')
+const convert = require('./convert/params')
+
+// Complex loading of config files require these 2 rules to be disabled.
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
 
 module.exports = function(app) {
-  makeUIApi(app);
-  makeFromPlugins(app);
-  makeFromFiles(app);
+  makeUIApi(app)
+  makeFromPlugins(app)
+  makeFromFiles(app)
 
-  app.use("/", function(req, res) {
-    respond(req, res, NotFound(req));
+  app.use("/", (req, res) => {
+    respond(req, res, NotFound(req))
   });
 }
 
 function makeUIApi(app) {
-  app.get(config.ui + "api/", require('../api/GET'));
-  app.post(config.ui + "api/", require('../api/POST'));
+  app.get(`${config.ui.pathname}/api`, UIAPI.get)
+  app.post(`${config.ui.pathname}/api`, UIAPI.post)
 }
 
 function makeFromPlugins(app) {
-  config.plugins.forEach(function(plugin) {
-    var route = plugin.url;
+  config.plugins.forEach((plugin) => {
+    const route = plugin.pathname;
 
-    app.use(route, function(req, res) {
-      require(plugin.location)(req, res);
-    });
-  });
+    app.use(route, (req, res) => {
+      require(plugin.location)(req, res)
+    })
+  })
 }
 
 function makeFromFiles(app) {
-  var files = walk(config.base.location);
+  config.services.forEach((service) => {
+    makeService(app, service)
+  })
+}
 
-  files.forEach(function(file) {
-    var method = getMethod(file);
+function makeService(app, service) {
+  const files = walk(service.location);
+
+  files.forEach((file) => {
+    const method = getMethod(file);
 
     if (method) {
-      var route = "/" + file.folder.replace(file.base, "").replace(/\\/g, "/");
-      route = route.replace(/\/\//g, "/"); // replace double '/' => mac issue?
-      route = convert.toURL(route)
-      route = config.base.url.replace(/\/$/, "") + route;
-      var data = require(path.join(file.folder, file.file.replace(".js", "")));
+      const route = folderToUrl(file, service)
+      const data = require(path.join(file.folder, file.file.replace(".js", "")));
       response.set({path: route}, method, data);
 
-      app[method.toLowerCase()](route, function(req, res) {
+      app[method.toLowerCase()](route, (req, res) => {
         respond(req, res, response.get(req));
       });
     }
@@ -53,10 +62,22 @@ function makeFromFiles(app) {
 }
 
 function getMethod(file) {
-  var method = file.file.replace(".js", "");
+  const method = file.file.replace(".js", "")
   if (config.verbs.indexOf(method) > -1) {
-    return method;
-  } else {
-    return null;
+    return method
   }
+  return null
+}
+
+function folderToUrl(file, service) {
+  const {folder, base} = file
+  // remove base folder
+  const route = path.join(
+    config.base.pathname,
+    service.pathname,
+    folder.replace(base, "")
+  ).replace(new RegExp("\\" + path.sep, "g"), "/")
+  console.log(route);
+
+  return convert.toURL(route);
 }

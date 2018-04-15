@@ -1,5 +1,5 @@
-var set = require('./file/set');
-var get = require('./file/get');
+const set = require('./file/set');
+const get = require('./file/get');
 
 module.exports = {
   get: get,
