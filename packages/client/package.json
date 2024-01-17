@@ -1,0 +1,31 @@
+{
+  "name": "@mockapiserver/client",
+  "version": "2.0.0",
+  "description": "UI for mockapiserver",
+  "author": "Richard Scoones <richard.scoones@gmail.com>",
+  "main": "./server",
+  "scripts": {
+    "build": "esbuild index.tsx --bundle --minify --sourcemap  --outfile=../../build/ui.js",
+    "watch": "esbuild index.tsx --bundle --sourcemap --watch  --outfile=../../build/ui.js --servedir=../../build --serve-fallback=../../build/index.html --define:IS_LOCAL=true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rscoones/MockServer.git"
+  },
+  "devDependencies": {
+    "@emotion/react": "11.11.3",
+    "@emotion/styled": "11.11.0",
+    "@mockapiserver/types": "2.0.0",
+    "@mui/material": "5.15.5",
+    "@mui/icons-material": "5.14.5",
+    "axios": "1.6.5",
+    "qs": "6.11.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.21.2",
+    "typescript": "5.3.3"
+  },
+  "license": "MIT",
+  "dependencies": {
+  }
+}

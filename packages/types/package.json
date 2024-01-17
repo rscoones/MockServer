@@ -1,0 +1,14 @@
+{
+  "name": "@mockapiserver/types",
+  "version": "2.0.0",
+  "description": "mockapiserver",
+  "author": "Richard Scoones <richard.scoones@gmail.com>",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rscoones/MockServer.git"
+  },
+  "devDependencies": {},
+  "license": "MIT",
+  "dependencies": {}
+}

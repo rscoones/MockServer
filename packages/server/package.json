@@ -1,0 +1,25 @@
+{
+  "name": "@mockapiserver/server",
+  "version": "2.0.0",
+  "description": "mockapiserver",
+  "author": "Richard Scoones <richard.scoones@gmail.com>",
+  "main": "./server",
+  "scripts": {
+    "build": "esbuild index.ts --bundle --minify --sourcemap  --outfile=../../build/server.js",
+    "watch": "esbuild index.tsx --bundle --sourcemap --watch  --outfile=../../build/server.js --servedir=../../build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rscoones/MockServer.git"
+  },
+  "devDependencies": {
+    "react": "18.2.0",
+    "react-bootstrap": "2.10.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.21.2",
+    "typescript": "5.3.3"
+  },
+  "license": "MIT",
+  "dependencies": {
+  }
+}
