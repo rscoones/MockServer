@@ -1,7 +1,7 @@
 import axios from "axios"
-
 import { List } from "@mockapiserver/types/List"
 import { Presets } from "@mockapiserver/types/Get"
+import { Mock } from "@mockapiserver/types/Mock"
 
 const URL = "http://localhost:8080/portal/api"
 
@@ -18,8 +18,13 @@ class API {
     return res.data
   }
 
-  async update(data: any) {
-    await axios.post(URL, data)
+  async update(route: string, method: string, data: Mock) {
+    const payload = {
+      url: route,
+      method,
+      data: JSON.stringify(data),
+    }
+    await axios.post(URL, payload)
 
     return this.list()
   }

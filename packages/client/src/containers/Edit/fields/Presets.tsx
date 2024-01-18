@@ -1,7 +1,7 @@
+import React from "react"
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import { PresetItem } from "@mockapiserver/types/Get"
 import { Mock } from "@mockapiserver/types/Mock"
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material"
-import React from "react"
 import { OnMockChange } from ".."
 
 interface Props {
@@ -16,7 +16,7 @@ const Presets: React.FC<Props> = ({ presets, mock, onChange }) => {
   }
 
   return (
-    <FormControl fullWidth>
+    <FormControl sx={{ width: "100ch" }}>
       <InputLabel id="presets">Presets</InputLabel>
       <Select
         labelId="presets"

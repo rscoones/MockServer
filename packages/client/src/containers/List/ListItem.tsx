@@ -2,7 +2,7 @@ import { ListRoute } from "@mockapiserver/types/List"
 import React from "react"
 import ListItemTick from "./ListItemTick"
 import { Link as RouterLink } from "react-router-dom"
-import { TableCell, TableRow, Typography } from "@mui/material"
+import { TableCell, TableRow } from "@mui/material"
 import Link from "@mui/material/Link"
 
 interface Props {

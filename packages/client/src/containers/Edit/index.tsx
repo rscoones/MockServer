@@ -1,12 +1,13 @@
 import React, { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import qs from "qs"
+import { Mock } from "@mockapiserver/types/Mock"
 import { List } from "@mockapiserver/types/List"
-import Fields from "./Form"
+import { Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material"
 import fetchPresets from "../../hooks/presets"
-import { Card, CardContent, Chip, Stack, Typography } from "@mui/material"
+import api from "../../services/api"
 import Presets from "./fields/Presets"
 import Form from "./Form"
-import { Mock } from "@mockapiserver/types/Mock"
 
 export type OnMockChange = (mock: Mock) => void
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const Edit: React.FC<Props> = (props) => {
+  const navigate = useNavigate()
   const query = qs.parse(window.location.search.replace("?", ""))
   const route = props.data.routes.find((t) => t.url === query.url)!
 
@@ -27,6 +29,11 @@ const Edit: React.FC<Props> = (props) => {
     setMock(mock)
   }
 
+  const handleSubmit = async () => {
+    await api.update(route.url, verb, mock)
+    navigate("/")
+  }
+
   return (
     <Card>
       <CardContent>
@@ -34,28 +41,35 @@ const Edit: React.FC<Props> = (props) => {
           <pre>{route.url}</pre>
         </Typography>
 
-        <Stack direction="row" spacing={1} marginBottom={2}>
-          {Object.keys(route).map(
-            (item) =>
-              props.data.verbs.includes(item) && (
-                <Chip
-                  onClick={() => {
-                    setVerb(item)
-                    setMock(route[item])
-                  }}
-                  label={item}
-                  variant={item === verb ? "outlined" : "filled"}
-                />
-              )
-          )}
-        </Stack>
-        <Presets
-          presets={presets.data[verb]}
-          mock={mock}
-          onChange={handlePreset}
-        />
-        <hr />
-        <Form mock={mock} onChange={setMock} />
+        <Box
+          sx={{
+            "& > :not(style)": { m: 1 },
+          }}
+        >
+          <Stack direction="row" spacing={1}>
+            {Object.keys(route).map(
+              (item) =>
+                props.data.verbs.includes(item) && (
+                  <Chip
+                    onClick={() => {
+                      setVerb(item)
+                      setMock(route[item])
+                    }}
+                    label={item}
+                    variant={item === verb ? "outlined" : "filled"}
+                  />
+                )
+            )}
+          </Stack>
+          <hr style={{ marginTop: 20, marginBottom: 20 }} />
+          <Presets
+            presets={presets.data[verb]}
+            mock={mock}
+            onChange={handlePreset}
+          />
+          <hr style={{ marginTop: 20, marginBottom: 20 }} />
+        </Box>
+        <Form mock={mock} onChange={setMock} onSubmit={handleSubmit} />
       </CardContent>
     </Card>
   )

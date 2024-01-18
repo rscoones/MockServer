@@ -1,7 +1,4 @@
 import React from "react"
-import ListItem from "./ListItem"
-import fetchList from "../../hooks/list"
-import { List } from "@mockapiserver/types/List"
 import {
   Table,
   TableBody,
@@ -10,6 +7,8 @@ import {
   TableRow,
   Typography,
 } from "@mui/material"
+import { List } from "@mockapiserver/types/List"
+import ListItem from "./ListItem"
 
 interface Props {
   data: List

@@ -3,7 +3,10 @@ export interface Mock {
   status: number
   headers: { [key: string]: string }
   body: { [key: string]: string }
-  type: MockServerType
+  /** @dprecated Use contentType instead */
+  type: string
+  contentType: string
+  raw: string
 }
 
 export enum MockServerType {
