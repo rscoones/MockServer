@@ -5,8 +5,8 @@
   "author": "Richard Scoones <richard.scoones@gmail.com>",
   "main": "./server",
   "scripts": {
-    "build": "esbuild index.tsx --bundle --minify --sourcemap  --outfile=../../build/ui.js",
-    "watch": "esbuild index.tsx --bundle --sourcemap --watch  --outfile=../../build/ui.js --servedir=../../build --serve-fallback=../../build/index.html --define:IS_LOCAL=true"
+    "build": "esbuild index.tsx --bundle --minify --sourcemap  --outfile=../../build/ui/index.js",
+    "watch": "esbuild index.tsx --bundle --sourcemap --watch  --outfile=../../build/ui/index.js --servedir=../../build/ui --serve-fallback=../../build/ui/index.html --define:IS_LOCAL=true"
   },
   "repository": {
     "type": "git",
