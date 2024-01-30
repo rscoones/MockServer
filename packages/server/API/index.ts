@@ -1,49 +1,48 @@
-import walk from "rs-filewalk"
+import { Express, Request } from "express"
 import path from "path"
-import { Express } from "express"
-import { Config } from "@mockapiserver/types/Config"
-import params from "../helpers/params"
+import Config from "../config"
+import FileService from "../services/file"
+import RoutesService from "../services/routes"
+import CacheService from "../services/cache"
+import { Mock } from "@mockapiserver/types/Mock"
+import respond from "../helpers/respond"
 
 export default class MockServerAPI {
   private app: Express
   private config: Config
 
-  constructor(app: Express, config: Config) {
+  constructor(
+    app: Express,
+    config: Config,
+    private services: {
+      file: FileService
+      routes: RoutesService
+      cache: CacheService
+    }
+  ) {
     this.app = app
     this.config = config
 
     this.initialise()
   }
 
-  protected initialise() {}
-
-  private parseFiles() {
-    var files = walk(this.config.base.location)
-
-    files.forEach((file) => {
-      var method = this.getMethod(file)
-
-      if (method) {
-        var route = "/" + file.folder.replace(file.base, "").replace(/\\/g, "/")
-        route = route.replace(/\/\//g, "/") // replace double '/' => mac issue?
-        route = params.toURL(route)
-        route = this.config.base.url.replace(/\/$/, "") + route
-        var data = require(path.join(file.folder, file.file.replace(".js", "")))
-        response.set({ path: route }, method, data)
-
-        this.app[method.toLowerCase()](route, (req, res) => {
-          respond(req, res, response.get(req))
-        })
-      }
+  protected initialise() {
+    this.services.routes.get().forEach((route) => {
+      this.app[route.method](
+        path.join(this.config.get().base.url, route.path),
+        async (req: Request, res) => {
+          const path = route.path
+          let data = await this.services.cache.get(
+            res.sessionId,
+            route.method,
+            path
+          )
+          if (!data) {
+            data = await this.services.file.get(route.method, path)
+          }
+          respond(req, res, data)
+        }
+      )
     })
-  }
-
-  private getMethod(file: any) {
-    var method = file.file.replace(".js", "")
-    if (this.config.verbs.indexOf(method) > -1) {
-      return method
-    } else {
-      return null
-    }
   }
 }

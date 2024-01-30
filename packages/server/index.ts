@@ -1,31 +1,42 @@
-import express, { Express } from "express"
-import { Config } from "@mockapiserver/types/Config"
+import { Express } from "express"
+import { Config as ConfigBase } from "@mockapiserver/types/Config"
+
 import MockServerUI from "./UI"
 import MockServerAPI from "./API"
+import Config from "./config"
+import FileService from "./services/file"
+import RoutesService from "./services/routes"
+import CacheService from "./services/cache"
 
 export default class MockServer {
-  private app: Express
-  private _config: Config
-  set config(cfg: Config) {
-    this._config = cfg
-  }
-  get config() {
-    return this._config
-  }
-
+  private config: Config
   ui: MockServerUI
   api: MockServerAPI
 
-  constructor(app: Express, config: Config) {
-    this.app = app
-    this.config = config
+  constructor(
+    private app: Express,
+    config: ConfigBase
+  ) {
+    this.config = new Config(config)
 
     this.initialise()
   }
 
   protected initialise() {
-    this.ui = new MockServerUI(this.app, this.config)
+    const fileService = new FileService(this.config)
+    const routesService = new RoutesService(this.config)
+    const cacheService = new CacheService()
+    routesService.refresh()
+
+    this.ui = new MockServerUI(this.app, this.config, {
+      file: fileService,
+      cache: cacheService,
+    })
     // MockServer APIs
-    this.api = new MockServerAPI(this.app, this.config)
+    this.api = new MockServerAPI(this.app, this.config, {
+      file: fileService,
+      routes: routesService,
+      cache: cacheService,
+    })
   }
 }
