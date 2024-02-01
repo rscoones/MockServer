@@ -10,14 +10,6 @@ new MockServer(app, {
     url: "/api",
     location: path.join(__dirname, "../../packages/example/api"),
   },
-  ui: {
-    url: "/portal",
-    location: path.join(__dirname, "../ui"),
-  },
-  verbs: [HTTPMethod.GET, HTTPMethod.POST],
-  session: {
-    secret: "bob",
-  },
 })
 
 app.listen(1337, () => {
