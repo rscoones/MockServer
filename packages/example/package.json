@@ -1,20 +1,19 @@
 {
-  "name": "@mockapiserver/server",
+  "name": "@mockapiserver/example",
   "version": "2.0.0",
-  "description": "mockapiserver",
+  "description": "example setup",
   "author": "Richard Scoones <richard.scoones@gmail.com>",
   "main": "./server",
   "scripts": {
-    "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --outfile=../../build/server/index.js",
-    "watch": "esbuild index.ts --bundle --sourcemap --platform=node --watch  --outfile=../../build/server/index.js"
+    "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --outfile=../../build/example/index.js",
+    "watch": "esbuild index.ts --bundle --sourcemap --platform=node --watch  --outfile=../../build/example/index.js"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:rscoones/MockServer.git"
   },
   "devDependencies": {
-    "typescript": "5.3.3",
-    "rs-filewalk": "1.0.1"
+    "typescript": "5.3.3"
   },
   "license": "MIT",
   "dependencies": {

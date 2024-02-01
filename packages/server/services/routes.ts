@@ -3,16 +3,19 @@ import walk from "rs-filewalk"
 import Config from "../config"
 import { File } from "@mockapiserver/types/FileWalk"
 import { Config as ConfigBase } from "@mockapiserver/types/Config"
+import { HTTPMethod } from "@mockapiserver/types/List"
 
 interface Route {
   path: string
-  method: string
+  method: HTTPMethod
 }
 
 export default class RoutesService {
   private routes: Route[]
 
-  constructor(private config: Config) {}
+  constructor(private config: Config) {
+    this.refresh()
+  }
 
   get(): Route[] {
     return this.routes
@@ -20,18 +23,22 @@ export default class RoutesService {
 
   refresh() {
     const files: File[] = walk(this.config.get().base.location)
-    this.routes = files.map((f) => {
-      const method = getMethod(this.config.get().verbs, f.file)
-      const route = f.folder.replace(path.sep, "/")
+    this.routes = files
+      .map((f) => {
+        const method = getMethod(this.config.get().verbs, f.file)
+        const route = f.folder.replace(path.sep, "/")
 
-      return { path: route, method }
-    })
+        if (method) {
+          return { path: route, method }
+        }
+      })
+      .filter((t) => !!t)
   }
 }
 
-function getMethod(verbs: ConfigBase["verbs"], file) {
-  var method = file.file.replace(/\.[jt]s/, "")
-  if (verbs.indexOf(method) > -1) {
+function getMethod(verbs: ConfigBase["verbs"], file: string) {
+  const method = file.replace(/\.[jt]s/, "")
+  if (verbs?.includes(method as HTTPMethod)) {
     return method
   } else {
     return null

@@ -1460,6 +1460,11 @@ resolve@^1.19.0:
     path-parse "^1.0.7"
     supports-preserve-symlinks-flag "^1.0.0"
 
+rs-filewalk@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/rs-filewalk/-/rs-filewalk-1.0.1.tgz#515f447c3f2bba537ecc4e254e831d4acd02c6fd"
+  integrity sha512-D0sz7CgDQRUoo/t64HzkdZuevrFuOehy7CA2ZyXagmiFXf7bHiYRLioU2VNVLpnSbjf79bAjkDK8XsVCB72eBQ==
+
 safe-buffer@5.2.1:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.1.tgz#1eaf9fa9bdb1fdd4ec75f58f9cdb4e6b7827eec6"

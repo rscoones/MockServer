@@ -1,51 +1,55 @@
 import path from "path"
 import walk from "rs-filewalk"
 import Config from "../config"
-import sortAlpha from "../helpers/sortAlpha"
 import parseWalk from "../helpers/parseWalk"
 import params from "../helpers/params"
-import { List } from "@mockapiserver/types/List"
-import { Mock } from "@mockapiserver/types/Mock"
+import { HTTPMethod, List } from "@mockapiserver/types/List"
+import { Mock, MockLike } from "@mockapiserver/types/Mock"
+import { Presets } from "@mockapiserver/types/Presets"
 
 export default class FileService {
   constructor(private config: Config) {}
 
-  async get(url: string): Promise<Mock> {
-    const bob = require(
-      path.join(this.config.get().base.location, pathname, filename)
+  get(method: HTTPMethod, url: string): MockLike {
+    let p
+    if (!url.includes(path.join(this.config.get().base.location))) {
+      p = path.join(path.join(this.config.get().base.location), url, method)
+    } else {
+      p = path.join(url, method)
+    }
+    return require(p)
+  }
+
+  getPreset(url: string, filename: string): MockLike {
+    return require(path.join(this.config.get().base.location, url, filename))
+  }
+
+  async presetsForUrl(url: string): Promise<Presets> {
+    const obj: Presets = this.config.get().verbs.reduce((prev, current) => {
+      return {
+        ...prev,
+        [current]: [],
+      }
+    }, {})
+
+    const folder = params.toFolder(url)
+    const files = parseWalk(
+      this.config.get().verbs,
+      walk(path.join(this.config.get().base.location, folder))
     )
 
-    // url = params.toFolder(url)
-    // var files = parseWalk(
-    //   this.config.get().verbs,
-    //   walk(path.join(this.config.get().base.location, url))
-    // )
+    files.forEach(function (file) {
+      file.folder = folder
+      obj[file.method].push(file)
+    })
 
-    // var obj = {}
-    // this.config.get().verbs.forEach(function (verb) {
-    //   obj[verb] = []
-    // })
-
-    // files.forEach(function (file) {
-    //   file.folder = url
-    //   obj[file.method].push(file)
-    // })
-
-    // Object.keys(obj).forEach(function (key) {
-    //   sortAlpha(obj[key], "filename")
-    // })
-
-    return {} as Mock
+    return obj
   }
 
-  async list(): Promise<List> {
+  async list(routes: string[]): Promise<List> {
     return {
       routes: [],
-      verbs: [],
+      verbs: this.config.get().verbs,
     }
   }
-
-  async update(method: string, data: Mock) {}
-
-  async useFile(filename: string) {}
 }

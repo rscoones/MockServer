@@ -4,7 +4,6 @@ import Config from "../config"
 import FileService from "../services/file"
 import RoutesService from "../services/routes"
 import CacheService from "../services/cache"
-import { Mock } from "@mockapiserver/types/Mock"
 import respond from "../helpers/respond"
 
 export default class MockServerAPI {
@@ -28,7 +27,7 @@ export default class MockServerAPI {
 
   protected initialise() {
     this.services.routes.get().forEach((route) => {
-      this.app[route.method](
+      this.app[route.method.toLowerCase()](
         path.join(this.config.get().base.url, route.path),
         async (req: Request, res) => {
           const path = route.path
@@ -38,7 +37,7 @@ export default class MockServerAPI {
             path
           )
           if (!data) {
-            data = await this.services.file.get(route.method, path)
+            data = this.services.file.get(route.method, path)
           }
           respond(req, res, data)
         }

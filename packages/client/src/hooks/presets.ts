@@ -1,7 +1,7 @@
 import { List } from "@mockapiserver/types/List"
 import { useEffect, useState } from "react"
 import api from "../services/api"
-import { Presets } from "@mockapiserver/types/Get"
+import { Presets } from "@mockapiserver/types/Presets"
 
 export default function fetchPresets(
   url: string

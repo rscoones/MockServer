@@ -6,20 +6,22 @@ export default async function respond(
   res: Response,
   data: MockLike
 ) {
-  let mock: Mock
-  if (typeof data === "function") {
-    let temp = data(req)
-    if ("then" in temp) {
-      mock = await temp
-    } else {
-      mock = temp
-    }
-  } else {
-    mock = data
-  }
-
+  const mock = await parseMock(data, req)
   res.status(mock.status || 200)
   res.set(mock.headers)
   res.type(mock.type || "json")
   res.json(mock.body)
+}
+
+export async function parseMock(data: MockLike, req: Request): Promise<Mock> {
+  if (typeof data === "function") {
+    let temp = data(req)
+    if ("then" in temp) {
+      return await temp
+    }
+
+    return temp
+  }
+
+  return data
 }

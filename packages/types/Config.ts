@@ -1,4 +1,5 @@
 import { SessionOptions } from "express-session"
+import { HTTPMethod } from "./List"
 
 export interface Config {
   base: {
@@ -7,14 +8,14 @@ export interface Config {
     /** Mocks location @default ```"<current directory>/api"``` */
     location: string
   }
-  ui: {
+  ui?: {
     /** UI portal for editting mocks @default ```"/portal"```` */
-    url: string
+    url?: string
     /** MockServer UI location @default ```mockapiserver's UI``` */
-    location: string
+    location?: string
   }
   /** Supported HTTP methods @default ```["GET", "POST", "PUT", "DELETE"]``` */
-  verbs: string[]
+  verbs?: HTTPMethod[]
   /** Session settings, uses "express-session" */
-  session: SessionOptions
+  session?: SessionOptions
 }

@@ -1,13 +1,13 @@
 import { Config } from "@mockapiserver/types/Config"
 import { File } from "@mockapiserver/types/FileWalk"
-import { PresetItem } from "@mockapiserver/types/Get"
+import { PresetItem } from "@mockapiserver/types/Presets"
 import path from "path"
-
-var parseMock = require("./parseMock")
+import sortAlpha from "../sortAlpha"
+import { parseMock } from "../respond"
 
 export default function parseWalk(verbs: Config["verbs"], files: File[]) {
-  var arr: PresetItem[] = []
-  files.forEach(function (file) {
+  const arr: PresetItem[] = []
+  sortAlpha(files, "file").forEach(function (file) {
     addFile(arr, verbs, file)
   })
 
@@ -15,23 +15,17 @@ export default function parseWalk(verbs: Config["verbs"], files: File[]) {
 }
 
 function addFile(arr: PresetItem[], verbs: Config["verbs"], file: File) {
-  // var method
-  // for (var i = 0; i < verbs.length; i++) {
-  //   if (file.file.indexOf(verbs[i]) > -1) {
-  //     method = verbs[i]
-  //     break
-  //   }
-  // }
-
   const method = verbs.find((t) => {
     return file.file.includes(t)
   })
 
+  // have method and file is current folder only, rs-filewalk should support depth maybe?
   if (method && file.folder.replace(file.base, "") === "") {
     const filename = file.file.replace(".js", "")
 
     let data = require(path.join(file.folder, filename))
-    data = parseMock(data)
+    // @todo: this may break, need a real request really
+    data = parseMock(data, {} as Request)
 
     arr.push({
       filename: filename,

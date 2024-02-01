@@ -1,4 +1,4 @@
-import { Express } from "express"
+import express, { Express } from "express"
 import { Config as ConfigBase } from "@mockapiserver/types/Config"
 
 import MockServerUI from "./UI"
@@ -23,14 +23,14 @@ export default class MockServer {
   }
 
   protected initialise() {
+    const cacheService = new CacheService()
     const fileService = new FileService(this.config)
     const routesService = new RoutesService(this.config)
-    const cacheService = new CacheService()
-    routesService.refresh()
 
     this.ui = new MockServerUI(this.app, this.config, {
       file: fileService,
       cache: cacheService,
+      routes: routesService,
     })
     // MockServer APIs
     this.api = new MockServerAPI(this.app, this.config, {

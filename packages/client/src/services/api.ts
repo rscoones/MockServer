@@ -1,6 +1,6 @@
 import axios from "axios"
 import { List } from "@mockapiserver/types/List"
-import { Presets } from "@mockapiserver/types/Get"
+import { Presets } from "@mockapiserver/types/Presets"
 import { Mock } from "@mockapiserver/types/Mock"
 
 const URL = "http://localhost:8080/portal/api"

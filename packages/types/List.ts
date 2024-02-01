@@ -1,12 +1,26 @@
 import { Mock } from "./Mock"
 
-export interface List {
-  routes: ListRoute[]
-  verbs: string[]
+export enum HTTPMethod {
+  CONNECT = "CONNECT",
+  DELETE = "DELETE",
+  GET = "GET",
+  HEAD = "HEAD",
+  OPTIONS = "OPTIONS",
+  POST = "POST",
+  PUT = "PUT",
+  TRACE = "TRACE",
 }
 
-export interface ListRoute {
+export interface List {
+  routes: ListRoute[]
+  verbs: HTTPMethod[]
+}
+
+export interface ListRoute extends HTTPMethodMocks {
   fullUrl: string
   url: string
-  [key: string]: Mock
+}
+
+export type HTTPMethodMocks = {
+  [key in HTTPMethod]?: Mock
 }

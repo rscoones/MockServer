@@ -1,6 +1,6 @@
 import React from "react"
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material"
-import { PresetItem } from "@mockapiserver/types/Get"
+import { PresetItem } from "@mockapiserver/types/Presets"
 import { Mock } from "@mockapiserver/types/Mock"
 import { OnMockChange } from ".."
 
